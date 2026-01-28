@@ -16,11 +16,11 @@ interface PlanningModalProps {
 }
 
 const CONTENT_TYPES = [
-  { label: 'Motivation du jour', value: 'motivation' },
-  { label: 'Conseil fitness', value: 'conseil' },
-  { label: 'Témoignage client', value: 'temoignage' },
-  { label: 'Promotion service', value: 'promo' },
-  { label: 'Aléatoire', value: 'random' },
+  { label: 'Motivation du jour', value: 'motivation', icon: 'bolt' },
+  { label: 'Conseil fitness', value: 'conseil', icon: 'graduation-cap' },
+  { label: 'Témoignage client', value: 'temoignage', icon: 'star' },
+  { label: 'Promotion service', value: 'promo', icon: 'bullhorn' },
+  { label: 'Aléatoire', value: 'random', icon: 'random' },
 ];
 
 const DAYS_LABELS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
@@ -51,16 +51,6 @@ export default function PlanningModal({ visible, onClose, onSave, platform }: Pl
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const handleSave = () => {
-    // For now, we are flattening the config to match the simpler PlanningConfig type 
-    // or we should update PlanningConfig type. 
-    // The user asked for "for each day choose theme and time".
-    // I will pass the raw schedule if I could, but PlanningConfig is simple.
-    // I'll stick to the PlanningConfig interface but maybe just save the active days 
-    // and use the current day's setting as 'global' or update the type.
-    // Since I can't easily change the backend expectation in a mock, 
-    // I'll assume we save the "active" days and maybe the "most common" settings 
-    // OR just console log the full detailed schedule.
-    
     const activeDays = Object.keys(schedule)
       .map(Number)
       .filter(day => schedule[day].active);
@@ -73,7 +63,6 @@ export default function PlanningModal({ visible, onClose, onSave, platform }: Pl
       notifyOnReady,
       requireValidation,
     });
-    // In a real app, I'd update PlanningConfig type to support detailed schedule
     console.log('Detailed Schedule:', schedule);
     onClose();
   };
@@ -99,9 +88,12 @@ export default function PlanningModal({ visible, onClose, onSave, platform }: Pl
       <View style={styles.overlay}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Planning {platform}</Text>
-            <TouchableOpacity onPress={onClose}>
-              <FontAwesome name="times" size={20} color={COLORS.textSecondary} />
+            <View>
+              <Text style={styles.subtitle}>Stratégie de Contenu</Text>
+              <Text style={styles.title}>Planning {platform}</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <FontAwesome name="times" size={16} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -111,78 +103,99 @@ export default function PlanningModal({ visible, onClose, onSave, platform }: Pl
             onSelectDay={setCurrentDay} 
           />
 
-          <ScrollView style={styles.content}>
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             <Text style={styles.dayTitle}>{DAYS_LABELS[currentDay]}</Text>
             
-            <View style={styles.switchRow}>
-              <Text style={styles.switchLabel}>Publier ce jour</Text>
-              <Switch
-                value={currentConfig.active}
-                onValueChange={(val) => updateDaySchedule({ active: val })}
-                trackColor={{ false: COLORS.backgroundTertiary, true: COLORS.primary }}
-              />
-            </View>
-
-            {currentConfig.active && (
-              <View style={styles.daySettings}>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Heure de publication :</Text>
-                  {Platform.OS === 'android' && (
-                    <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.timeButton}>
-                      <Text style={styles.timeText}>{format(currentConfig.time, 'HH:mm')}</Text>
-                    </TouchableOpacity>
-                  )}
-                  {(Platform.OS === 'ios' || showTimePicker) && (
-                    <DateTimePicker
-                      value={currentConfig.time}
-                      mode="time"
-                      display="default"
-                      onChange={handleTimeChange}
-                      style={{ width: 100 }}
-                      textColor={COLORS.textPrimary}
-                      themeVariant="dark"
-                    />
-                  )}
+            <View style={styles.card}>
+              <View style={styles.switchRow}>
+                <View>
+                  <Text style={styles.switchLabel}>Publication active</Text>
+                  <Text style={styles.switchSubLabel}>Poster ce jour-là</Text>
                 </View>
-
-                <Text style={[styles.label, { marginTop: SPACING.md }]}>Type de contenu :</Text>
-                {CONTENT_TYPES.map(type => (
-                  <TouchableOpacity
-                    key={type.value}
-                    style={styles.radioRow}
-                    onPress={() => updateDaySchedule({ contentType: type.value })}
-                  >
-                    <View style={[styles.radio, currentConfig.contentType === type.value && styles.radioActive]} />
-                    <Text style={[styles.radioLabel, currentConfig.contentType === type.value && styles.radioLabelActive]}>
-                      {type.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                <Switch
+                  value={currentConfig.active}
+                  onValueChange={(val) => updateDaySchedule({ active: val })}
+                  trackColor={{ false: COLORS.backgroundTertiary, true: COLORS.primary }}
+                  thumbColor={Platform.OS === 'ios' ? '#FFF' : '#FFF'}
+                />
               </View>
-            )}
 
-            <View style={styles.divider} />
+              {currentConfig.active && (
+                <View style={styles.daySettings}>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Heure de publication</Text>
+                    {Platform.OS === 'android' && (
+                      <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.timeButton}>
+                        <Text style={styles.timeText}>{format(currentConfig.time, 'HH:mm')}</Text>
+                      </TouchableOpacity>
+                    )}
+                    {(Platform.OS === 'ios' || showTimePicker) && (
+                      <DateTimePicker
+                        value={currentConfig.time}
+                        mode="time"
+                        display="default"
+                        onChange={handleTimeChange}
+                        style={{ width: 80 }}
+                        textColor={COLORS.textPrimary}
+                        themeVariant="dark"
+                      />
+                    )}
+                  </View>
 
-            <View style={styles.switchRow}>
-              <Text style={styles.switchLabel}>Me notifier quand un post est prêt</Text>
-              <Switch
-                value={notifyOnReady}
-                onValueChange={setNotifyOnReady}
-                trackColor={{ false: COLORS.backgroundTertiary, true: COLORS.primary }}
-              />
+                  <Text style={[styles.label, { marginTop: SPACING.md, marginBottom: SPACING.sm }]}>Type de contenu</Text>
+                  <View style={styles.typesGrid}>
+                    {CONTENT_TYPES.map(type => (
+                      <TouchableOpacity
+                        key={type.value}
+                        style={[
+                          styles.typeCard,
+                          currentConfig.contentType === type.value && styles.typeCardActive
+                        ]}
+                        onPress={() => updateDaySchedule({ contentType: type.value })}
+                        activeOpacity={0.7}
+                      >
+                        <FontAwesome 
+                          name={type.icon as any} 
+                          size={16} 
+                          color={currentConfig.contentType === type.value ? COLORS.textPrimary : COLORS.textSecondary} 
+                          style={{ marginBottom: 4 }}
+                        />
+                        <Text style={[
+                          styles.typeLabel, 
+                          currentConfig.contentType === type.value && styles.typeLabelActive
+                        ]}>
+                          {type.label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
             </View>
 
-            <View style={styles.switchRow}>
-              <Text style={styles.switchLabel}>Demander validation avant publi</Text>
-              <Switch
-                value={requireValidation}
-                onValueChange={setRequireValidation}
-                trackColor={{ false: COLORS.backgroundTertiary, true: COLORS.primary }}
-              />
+            <Text style={styles.sectionTitle}>Préférences Globales</Text>
+            <View style={styles.card}>
+              <View style={[styles.switchRow, { borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: SPACING.md, marginBottom: SPACING.md }]}>
+                <Text style={styles.switchLabel}>Notification "Prêt à poster"</Text>
+                <Switch
+                  value={notifyOnReady}
+                  onValueChange={setNotifyOnReady}
+                  trackColor={{ false: COLORS.backgroundTertiary, true: COLORS.primary }}
+                />
+              </View>
+
+              <View style={styles.switchRow}>
+                <Text style={styles.switchLabel}>Validation manuelle requise</Text>
+                <Switch
+                  value={requireValidation}
+                  onValueChange={setRequireValidation}
+                  trackColor={{ false: COLORS.backgroundTertiary, true: COLORS.primary }}
+                />
+              </View>
             </View>
           </ScrollView>
 
-          <Button title="SAUVEGARDER" onPress={handleSave} style={styles.saveButton} />
+          <Button title="SAUVEGARDER LE PLANNING" onPress={handleSave} style={styles.saveButton} />
         </View>
       </View>
     </Modal>
@@ -192,26 +205,40 @@ export default function PlanningModal({ visible, onClose, onSave, platform }: Pl
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: COLORS.background, // Darker background
     borderTopLeftRadius: BORDER_RADIUS.xl,
     borderTopRightRadius: BORDER_RADIUS.xl,
     padding: SPACING.lg,
-    height: '90%', // Fixed height to allow scrolling
+    height: '92%',
+    ...SHADOWS.large,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: SPACING.lg,
+  },
+  subtitle: {
+    fontFamily: FONTS.medium,
+    fontSize: 12,
+    color: COLORS.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 24,
     color: COLORS.textPrimary,
+  },
+  closeButton: {
+    padding: SPACING.xs,
+    backgroundColor: COLORS.backgroundSecondary,
+    borderRadius: BORDER_RADIUS.full,
   },
   content: {
     flex: 1,
@@ -219,83 +246,102 @@ const styles = StyleSheet.create({
   },
   dayTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 18,
     color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
     marginTop: SPACING.xs,
   },
-  daySettings: {
-    backgroundColor: COLORS.backgroundTertiary,
+  card: {
+    backgroundColor: COLORS.backgroundSecondary,
+    borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  daySettings: {
+    marginTop: SPACING.md,
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
   },
   label: {
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.semiBold,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.sm,
+    fontSize: 13,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: SPACING.xs,
-    marginBottom: SPACING.sm,
   },
   timeButton: {
-    backgroundColor: COLORS.backgroundSecondary,
-    padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm,
-    minWidth: 80,
-    alignItems: 'center',
+    backgroundColor: COLORS.backgroundTertiary,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   timeText: {
     color: COLORS.textPrimary,
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.bold,
+    fontSize: 16,
   },
-  radioRow: {
+  typesGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+  },
+  typeCard: {
+    width: '48%',
+    backgroundColor: COLORS.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.sm,
     alignItems: 'center',
-    marginBottom: SPACING.sm,
-    paddingVertical: 4,
+    justifyContent: 'center',
+    marginBottom: SPACING.xs,
   },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: COLORS.textSecondary,
-    marginRight: SPACING.sm,
-  },
-  radioActive: {
-    borderColor: COLORS.primary,
+  typeCardActive: {
     backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
-  radioLabel: {
+  typeLabel: {
+    fontSize: 12,
     color: COLORS.textSecondary,
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.medium,
+    textAlign: 'center',
   },
-  radioLabelActive: {
+  typeLabelActive: {
     color: COLORS.textPrimary,
+    fontFamily: FONTS.bold,
+  },
+  sectionTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 16,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
   },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.md,
   },
   switchLabel: {
     color: COLORS.textPrimary,
+    fontFamily: FONTS.medium,
+    fontSize: 15,
+  },
+  switchSubLabel: {
+    color: COLORS.textMuted,
     fontFamily: FONTS.regular,
-    flex: 1,
+    fontSize: 12,
+    marginTop: 2,
   },
   saveButton: {
-    marginTop: SPACING.md,
-    marginBottom: SPACING.xl, // Extra bottom margin for safety
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-    marginVertical: SPACING.md,
+    marginBottom: SPACING.xl,
+    marginTop: SPACING.sm,
   },
 });

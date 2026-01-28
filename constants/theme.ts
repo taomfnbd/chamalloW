@@ -1,31 +1,35 @@
 export const COLORS = {
-  // Primaires
-  primary: '#FF6B35',
-  primaryDark: '#E55A2B',
-  primaryLight: '#FF8A5C',
-  
+  // Brand Colors
+  primary: '#FF5722', // Deep Orange - High Energy
+  primaryDark: '#E64A19',
+  primaryLight: '#FF8A65',
+  accent: '#2979FF', // Electric Blue for contrast
+
   // Backgrounds
-  background: '#0D0D0D',
-  backgroundSecondary: '#1A1A1A',
-  backgroundTertiary: '#2A2A2A',
+  background: '#0F1115', // Very dark blue/grey
+  backgroundSecondary: '#181B21', // Card background
+  backgroundTertiary: '#23262E', // Input/Hover background
   
-  // Textes
+  // Text
   textPrimary: '#FFFFFF',
-  textSecondary: '#B0B0B0',
-  textMuted: '#666666',
+  textSecondary: '#A0A3BD',
+  textMuted: '#6E7191',
+  textInverse: '#0F1115',
   
-  // États
-  success: '#4CAF50',
-  error: '#F44336',
-  warning: '#FFC107',
+  // Status
+  success: '#00C853',
+  error: '#FF3D00',
+  warning: '#FFD600',
+  info: '#2979FF',
   
   // Chat
-  bubbleUser: '#FF6B35',
-  bubbleAI: '#2A2A2A',
+  bubbleUser: '#FF5722',
+  bubbleAI: '#23262E',
   
-  // Bordures
-  border: '#333333',
-  borderLight: '#444444',
+  // UI Elements
+  border: '#2E323B',
+  borderLight: '#3F4451',
+  overlay: 'rgba(15, 17, 21, 0.85)',
 };
 
 export const FONTS = {
@@ -42,6 +46,7 @@ export const SPACING = {
   lg: 24,
   xl: 32,
   xxl: 48,
+  gutter: 20, // Standard screen padding
 };
 
 export const BORDER_RADIUS = {
@@ -49,6 +54,7 @@ export const BORDER_RADIUS = {
   md: 12,
   lg: 16,
   xl: 24,
+  xxl: 32,
   full: 9999,
 };
 
@@ -56,15 +62,29 @@ export const SHADOWS = {
   small: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.15,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 3,
   },
   medium: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.30,
-    shadowRadius: 4.65,
-    elevation: 8,
+    shadowOpacity: 0.25,
+    shadowRadius: 5.84,
+    elevation: 6,
   },
+  large: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 12,
+  },
+  primary: {
+    shadowColor: '#FF5722',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 10, // Android (color shadow not supported natively well but elevation works)
+  }
 };

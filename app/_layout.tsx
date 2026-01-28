@@ -9,7 +9,8 @@ import 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { COLORS } from '../constants/theme';
-import { ChatProvider } from '../contexts/ChatContext';
+import { ChatProvider, useChatContext } from '../contexts/ChatContext';
+import Toast from '../components/ui/Toast';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,13 +57,22 @@ function RootLayoutNav() {
       <ChatProvider>
         <ThemeProvider value={DarkTheme}>
           <StatusBar style="light" />
-          <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack>
-          </View>
+          <AppContent />
         </ThemeProvider>
       </ChatProvider>
     </SafeAreaProvider>
+  );
+}
+
+function AppContent() {
+  const { error } = useChatContext();
+  
+  return (
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+      <Toast message={error} />
+    </View>
   );
 }

@@ -11,6 +11,7 @@ import PlanningModal from '../../components/planning/PlanningModal';
 import AgentTrainer from '../../components/agent/AgentTrainer';
 import SuggestionList from '../../components/chat/SuggestionList';
 import ScreenLayout from '../../components/ui/ScreenLayout';
+import TypingIndicator from '../../components/ui/TypingIndicator';
 import { api } from '../../services/api';
 
 const INSTAGRAM_SUGGESTIONS = [
@@ -95,16 +96,9 @@ export default function InstagramScreen() {
       />
 
       <View style={styles.chatContainer}>
-        {!currentConversation ? (
+        {(!currentConversation || currentConversation.messages.length === 0) ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>👋 Salut Rudy !</Text>
-            <Text style={styles.emptyText}>
-              Je suis prêt à t'aider à créer du contenu visuel et engageant pour Instagram.
-              Commence une nouvelle conversation ou sélectionnes-en une existante.
-            </Text>
-            <Text style={styles.suggestion} onPress={handleNewConversation}>
-              [+] Nouvelle conversation
-            </Text>
             
             <SuggestionList 
               suggestions={INSTAGRAM_SUGGESTIONS} 
@@ -124,23 +118,19 @@ export default function InstagramScreen() {
                   onUpdate={updateMessage}
                   onRegenerate={regenerateMessage}
                   onValidate={validateMessage}
+                  platform="instagram"
                 />
               ) : (
                 <ChatBubble message={item} />
               )
             )}
-            ListFooterComponent={isLoading ? (
-               <View style={styles.loadingBubble}>
-                 <Text style={styles.loadingText}>typing...</Text>
-               </View>
-            ) : null}
+            ListFooterComponent={isLoading ? <TypingIndicator /> : null}
           />
         )}
       </View>
 
       <ChatInput 
-        onSend={handleSend} 
-        onAttach={() => console.log('Attach')}
+        onSend={(content, attachments) => handleSend(content)} 
         isLoading={isLoading}
       />
     </ScreenLayout>

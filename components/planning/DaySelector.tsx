@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../../constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '../../constants/theme';
 
 interface DaySelectorProps {
   schedule: Record<number, { active: boolean }>;
@@ -26,6 +26,7 @@ export default function DaySelector({ schedule, currentDay, onSelectDay }: DaySe
               isActive && !isSelected && styles.dayButtonActive
             ]}
             onPress={() => onSelectDay(index)}
+            activeOpacity={0.8}
           >
             <Text style={[
               styles.dayText, 
@@ -46,30 +47,31 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.backgroundTertiary,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.sm,
+    backgroundColor: COLORS.backgroundSecondary,
+    borderRadius: BORDER_RADIUS.full,
+    padding: SPACING.xs,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   dayButton: {
     alignItems: 'center',
-    padding: SPACING.xs,
-    borderRadius: BORDER_RADIUS.sm,
-    width: 40,
-    height: 50,
     justifyContent: 'center',
+    width: 44,
+    height: 54,
+    borderRadius: 22,
   },
   dayButtonSelected: {
     backgroundColor: COLORS.primary,
+    ...SHADOWS.small,
   },
   dayButtonActive: {
-    backgroundColor: COLORS.backgroundSecondary,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.backgroundTertiary,
   },
   dayText: {
     color: COLORS.textMuted,
     fontFamily: FONTS.medium,
-    fontSize: 10,
+    fontSize: 11,
     marginBottom: 4,
   },
   dayTextSelected: {
@@ -77,7 +79,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
   },
   dayTextActive: {
-    color: COLORS.primary,
+    color: COLORS.primaryLight,
   },
   dot: {
     width: 4,

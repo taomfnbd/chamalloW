@@ -201,12 +201,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: COLORS.backgroundSecondary,
+    backgroundColor: COLORS.background, // Darker
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    height: '90%',
+    height: '92%',
     paddingTop: SPACING.lg,
-    ...SHADOWS.medium,
+    ...SHADOWS.large,
   },
   header: {
     flexDirection: 'row',
@@ -260,11 +260,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.backgroundTertiary,
+    backgroundColor: COLORS.backgroundSecondary,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
     borderLeftWidth: 3,
     borderLeftColor: COLORS.primary,
+    marginBottom: SPACING.xs,
   },
   listItemText: {
     color: COLORS.textPrimary,

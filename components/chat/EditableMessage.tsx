@@ -5,19 +5,22 @@ import { Message } from '../../types';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
+import PostPreview from './PostPreview';
 
 interface EditableMessageProps {
   message: Message;
   onUpdate: (id: string, newContent: string) => void;
   onRegenerate: (id: string) => void;
   onValidate: (id: string) => void;
+  platform?: 'linkedin' | 'instagram';
 }
 
 export default function EditableMessage({ 
   message, 
   onUpdate, 
   onRegenerate, 
-  onValidate 
+  onValidate,
+  platform
 }: EditableMessageProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(message.content);
@@ -40,57 +43,68 @@ export default function EditableMessage({
   };
 
   return (
-    <View style={styles.container}>
-      {isEditing ? (
-        <View style={styles.editContainer}>
-          <TextInput
-            style={styles.input}
-            multiline
-            value={editContent}
-            onChangeText={setEditContent}
-            textAlignVertical="top"
-          />
-          <View style={styles.editActions}>
-            <TouchableOpacity onPress={handleCancel} style={styles.editButton}>
-              <Text style={styles.cancelText}>Annuler</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleSave} style={[styles.editButton, styles.saveButton]}>
-              <Text style={styles.saveText}>Sauvegarder</Text>
-            </TouchableOpacity>
+    <View style={styles.wrapper}>
+      <View style={styles.avatar}>
+        <FontAwesome name="bolt" size={14} color={COLORS.primary} />
+      </View>
+      
+      <View style={styles.container}>
+        {isEditing ? (
+          <View style={styles.editContainer}>
+            <TextInput
+              style={styles.input}
+              multiline
+              value={editContent}
+              onChangeText={setEditContent}
+              textAlignVertical="top"
+            />
+            <View style={styles.editActions}>
+              <TouchableOpacity onPress={handleCancel} style={styles.editButton}>
+                <Text style={styles.cancelText}>Annuler</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleSave} style={[styles.editButton, styles.saveButton]}>
+                <Text style={styles.saveText}>Sauvegarder</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ) : (
-        <View style={styles.contentContainer}>
-          <Text style={styles.text}>{message.content}</Text>
-          <TouchableOpacity 
-            onPress={() => setIsEditing(true)} 
-            style={styles.editIcon}
-          >
-            <FontAwesome name="pencil" size={16} color={COLORS.textMuted} />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <View style={styles.footer}>
-        {message.score !== undefined && (
-          <View style={styles.scoreContainer}>
-            <FontAwesome name="thumbs-up" size={14} color={COLORS.success} />
-            <Text style={styles.scoreText}>{message.score}/100</Text>
+        ) : (
+          <View style={styles.contentContainer}>
+            {platform ? (
+              <PostPreview platform={platform} content={message.content} />
+            ) : (
+              <Text style={styles.text}>{message.content}</Text>
+            )}
+            
+            <TouchableOpacity 
+              onPress={() => setIsEditing(true)} 
+              style={styles.editIcon}
+            >
+              <FontAwesome name="pencil" size={16} color={COLORS.textMuted} />
+            </TouchableOpacity>
           </View>
         )}
-        
-        <View style={styles.actions}>
-          <TouchableOpacity onPress={() => onRegenerate(message.id)} style={styles.actionButton}>
-            <FontAwesome name="refresh" size={18} color={COLORS.textSecondary} />
-          </TouchableOpacity>
+
+        <View style={styles.footer}>
+          {message.score !== undefined && (
+            <View style={styles.scoreContainer}>
+              <FontAwesome name="thumbs-up" size={14} color={COLORS.success} />
+              <Text style={styles.scoreText}>{message.score}/100</Text>
+            </View>
+          )}
           
-          <TouchableOpacity onPress={handleCopy} style={styles.actionButton}>
-            <FontAwesome name="clipboard" size={18} color={COLORS.textSecondary} />
-          </TouchableOpacity>
-          
-          <TouchableOpacity onPress={() => onValidate(message.id)} style={styles.actionButton}>
-            <FontAwesome name="check-circle" size={18} color={COLORS.success} />
-          </TouchableOpacity>
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={() => onRegenerate(message.id)} style={styles.actionButton}>
+              <FontAwesome name="refresh" size={18} color={COLORS.textSecondary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity onPress={handleCopy} style={styles.actionButton}>
+              <FontAwesome name="clipboard" size={18} color={COLORS.textSecondary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity onPress={() => onValidate(message.id)} style={styles.actionButton}>
+              <FontAwesome name="check-circle" size={18} color={COLORS.success} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -98,24 +112,43 @@ export default function EditableMessage({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: COLORS.bubbleAI,
-    borderRadius: 20,
-    borderBottomLeftRadius: 4,
-    marginVertical: SPACING.xs,
-    maxWidth: '90%',
-    alignSelf: 'flex-start',
-    overflow: 'hidden',
+  wrapper: {
+    marginVertical: SPACING.md, // Increased spacing
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    width: '100%',
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 14,
+    backgroundColor: COLORS.backgroundSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 4,
     ...SHADOWS.small,
   },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bubbleAI,
+    borderRadius: 24, // Consistent with ChatBubble
+    borderBottomLeftRadius: 4,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    overflow: 'hidden',
+    ...SHADOWS.medium,
+  },
   contentContainer: {
-    padding: SPACING.md,
-    paddingRight: SPACING.xl + SPACING.sm, // Extra space for edit icon
+    padding: 14,
+    paddingHorizontal: 18,
   },
   text: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
     color: COLORS.textPrimary,
   },
   editIcon: {
@@ -123,6 +156,9 @@ const styles = StyleSheet.create({
     top: SPACING.sm,
     right: SPACING.sm,
     padding: SPACING.xs,
+    zIndex: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 12,
   },
   editContainer: {
     padding: SPACING.sm,
@@ -132,9 +168,9 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontFamily: FONTS.regular,
     fontSize: 16,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.md,
     padding: SPACING.sm,
-    minHeight: 100,
+    minHeight: 150,
   },
   editActions: {
     flexDirection: 'row',
@@ -162,7 +198,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: SPACING.sm,
+    padding: 10,
+    paddingHorizontal: 18,
     backgroundColor: COLORS.backgroundTertiary,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
@@ -179,9 +216,9 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
-    gap: SPACING.md,
+    gap: SPACING.lg,
   },
   actionButton: {
-    padding: 4,
+    padding: 2,
   },
 });

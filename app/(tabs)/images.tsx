@@ -9,6 +9,7 @@ import ChatInput from '../../components/chat/ChatInput';
 import ImageBubble from '../../components/chat/ImageBubble';
 import SuggestionList from '../../components/chat/SuggestionList';
 import ScreenLayout from '../../components/ui/ScreenLayout';
+import TypingIndicator from '../../components/ui/TypingIndicator';
 import { useChat } from '../../hooks/useChat';
 import PlanningModal from '../../components/planning/PlanningModal';
 import AgentTrainer from '../../components/agent/AgentTrainer';
@@ -56,37 +57,16 @@ export default function ImagesScreen() {
     }
   }, [currentConversation?.messages]);
 
-  const handleSend = (content: string) => {
-    sendMessage('images', content);
-  };
-
-  const handleAttach = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        // Send image message
-        // For now, sendMessage only accepts text. We need to handle image upload.
-        // But since I updated ChatContext to assume sendMessage is text, 
-        // I might need to adapt.
-        // However, I can send a text message with a special prefix or just handle it here?
-        // No, I should use sendMessage but I need to pass attachment.
-        // Actually, for MVP I'll send the URI as text content for now, or assume sendMessage handles it if I updated context.
-        // Wait, I updated sendMessage to handle 'images' platform by calling `api.chatImage(content)`.
-        // But `content` is string.
-        // If I want to send an image *as input*, `api.chatImage` accepts `imageUri`.
-        // My `sendMessage` in `ChatContext` doesn't support attachment input yet.
-        // I'll skip image *input* via context for now to keep it simple and consistent with "same page structure".
-        // Or I can send a text description "Image envoyée: [url]" which is a bit hacky but works for mock.
-        sendMessage('images', `[Image] ${result.assets[0].uri}`);
+  const handleSend = (content: string, attachments: any[] = []) => {
+    if (attachments.length > 0) {
+      // For now, simulate sending the first image attachment as the content
+      const firstImage = attachments.find(a => a.type === 'image');
+      if (firstImage) {
+        sendMessage('images', `[Image] ${firstImage.uri}`);
+        return;
       }
-    } catch (error) {
-      console.error(error);
     }
+    sendMessage('images', content);
   };
 
   const handleNewConversation = () => {
@@ -167,16 +147,9 @@ export default function ImagesScreen() {
       />
 
       <View style={styles.chatContainer}>
-        {!currentConversation ? (
+        {(!currentConversation || currentConversation.messages.length === 0) ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>Générateur d'Images IA 🎨</Text>
-            <Text style={styles.emptyText}>
-              Décris l'image que tu souhaites créer, ou envoie une photo de référence.
-              Je suis là pour t'aider à visualiser tes idées !
-            </Text>
-            <Text style={styles.suggestion} onPress={handleNewConversation}>
-              [+] Nouvelle conversation
-            </Text>
             
             <SuggestionList 
               suggestions={IMAGES_SUGGESTIONS} 
@@ -190,18 +163,13 @@ export default function ImagesScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.messagesList}
             renderItem={renderItem}
-            ListFooterComponent={isLoading ? (
-               <View style={styles.loadingBubble}>
-                 <Text style={styles.loadingText}>Création en cours...</Text>
-               </View>
-            ) : null}
+            ListFooterComponent={isLoading ? <TypingIndicator /> : null}
           />
         )}
       </View>
 
       <ChatInput 
-        onSend={handleSend} 
-        onAttach={handleAttach}
+        onSend={handleSend}
         isLoading={isLoading}
       />
     </ScreenLayout>

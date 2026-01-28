@@ -9,6 +9,7 @@ interface ChatContextType {
   conversations: Conversation[];
   currentConversation: Conversation | null;
   isLoading: boolean;
+  error: string | null;
   sendMessage: (platform: 'linkedin' | 'instagram' | 'images', content: string) => Promise<void>;
   updateMessage: (messageId: string, newContent: string) => void;
   regenerateMessage: (messageId: string) => Promise<void>;
@@ -26,6 +27,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Load from storage
   useEffect(() => {
@@ -96,7 +98,21 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   };
 
   const sendMessage = async (platform: 'linkedin' | 'instagram' | 'images', content: string) => {
-    if (!currentConversationId) return;
+    let conversationId = currentConversationId;
+
+    if (!conversationId) {
+      const newConv: Conversation = {
+        id: uuidv4(),
+        platform,
+        title: content.substring(0, 30) + '...',
+        messages: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      setConversations(prev => [newConv, ...prev]);
+      setCurrentConversationId(newConv.id);
+      conversationId = newConv.id;
+    }
 
     setIsLoading(true);
     
@@ -109,7 +125,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     };
 
     setConversations(prev => prev.map(c => {
-      if (c.id === currentConversationId) {
+      if (c.id === conversationId) {
         // Update title if it's the first message
         const title = c.messages.length === 0 ? content.substring(0, 30) + '...' : c.title;
         return {
@@ -130,12 +146,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         aiMsg = {
           id: uuidv4(),
           role: 'assistant',
-          content: response.content || response.text || '', // Image URL or text
+          content: response.content || response.text || '', 
           timestamp: new Date(),
-          // If response.type === 'image', content is URL. If text, content is text.
-          // We might need to store 'type' in Message or infer from content.
-          // For now, let's assume if it starts with http it's an image? Or add 'attachments'.
-          // To be consistent with existing Message type, let's use attachments for images.
         };
 
         if (response.type === 'image' && response.content) {
@@ -151,7 +163,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
 
       } else {
-        const response = await api.sendMessage(platform, content, currentConversationId);
+        const response = await api.sendMessage(platform, content, conversationId!);
         aiMsg = {
           id: uuidv4(),
           role: 'assistant',
@@ -163,7 +175,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }
 
       setConversations(prev => prev.map(c => {
-        if (c.id === currentConversationId) {
+        if (c.id === conversationId) {
           return {
             ...c,
             updatedAt: new Date(),
@@ -173,9 +185,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         return c;
       }));
 
-    } catch (error) {
-      console.error('Error sending message', error);
-      // Handle error (maybe add an error message to chat)
+    } catch (err) {
+      console.error('Error sending message', err);
+      setError("Impossible d'envoyer le message. Vérifiez votre connexion.");
+      setTimeout(() => setError(null), 4000);
     } finally {
       setIsLoading(false);
     }
@@ -262,6 +275,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       conversations,
       currentConversation,
       isLoading,
+      error,
       sendMessage,
       updateMessage,
       regenerateMessage,

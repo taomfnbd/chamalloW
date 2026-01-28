@@ -114,9 +114,9 @@ export default function ConversationSidebar({
             <View style={styles.footer}>
               <TouchableOpacity style={styles.footerItem}>
                 <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>RM</Text>
+                  <Text style={styles.avatarText}>T</Text>
                 </View>
-                <Text style={styles.footerText}>Rudy Morel</Text>
+                <Text style={styles.footerText}>Tao Mariani</Text>
               </TouchableOpacity>
             </View>
           </SafeAreaView>
@@ -133,18 +133,20 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.7)',
   },
   sidebar: {
-    width: '80%',
+    width: '85%',
     maxWidth: 320,
-    backgroundColor: '#171717', // ChatGPT-like dark background
+    backgroundColor: COLORS.background, // Use theme background
     height: '100%',
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 10,
+    borderRightWidth: 1,
+    borderRightColor: COLORS.border,
   },
   safeArea: {
     flex: 1,
@@ -152,15 +154,17 @@ const styles = StyleSheet.create({
   header: {
     padding: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#2A2A2A',
+    borderBottomColor: COLORS.border,
   },
   newChatButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#2A2A2A', // Lighter bg for button
+    backgroundColor: COLORS.backgroundSecondary, // Use theme background
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   newChatContent: {
     flexDirection: 'row',
@@ -179,7 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   sectionTitle: {
-    color: '#666',
+    color: COLORS.textMuted,
     fontSize: 12,
     fontFamily: FONTS.medium,
     marginBottom: SPACING.xs,
@@ -193,7 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.md,
   },
   itemActive: {
-    backgroundColor: '#2A2A2A',
+    backgroundColor: COLORS.backgroundSecondary,
   },
   itemIcon: {
     marginRight: SPACING.sm,
@@ -212,7 +216,7 @@ const styles = StyleSheet.create({
   footer: {
     padding: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: '#2A2A2A',
+    borderTopColor: COLORS.border,
   },
   footerItem: {
     flexDirection: 'row',
@@ -222,7 +226,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 32,
     height: 32,
-    borderRadius: 4, // ChatGPT square-ish avatar
+    borderRadius: 8, 
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -230,7 +234,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: '#FFF',
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: FONTS.bold,
   },
   footerText: {

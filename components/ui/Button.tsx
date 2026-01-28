@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
-import { COLORS, FONTS, BORDER_RADIUS, SPACING } from '../../constants/theme';
+import { COLORS, FONTS, BORDER_RADIUS, SPACING, SHADOWS } from '../../constants/theme';
 import * as Haptics from 'expo-haptics';
 
 interface ButtonProps {
@@ -57,9 +57,16 @@ export default function Button({
   const getBorder = () => {
     if (variant === 'outline') {
       return {
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderColor: disabled ? COLORS.border : COLORS.primary,
       };
+    }
+    return {};
+  };
+
+  const getShadow = () => {
+    if (variant === 'primary' && !disabled) {
+      return SHADOWS.primary;
     }
     return {};
   };
@@ -67,15 +74,15 @@ export default function Button({
   const getPadding = () => {
     switch (size) {
       case 'sm': return { paddingVertical: SPACING.xs, paddingHorizontal: SPACING.md };
-      case 'md': return { paddingVertical: SPACING.sm + 4, paddingHorizontal: SPACING.lg };
-      case 'lg': return { paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl };
-      default: return { paddingVertical: SPACING.sm, paddingHorizontal: SPACING.lg };
+      case 'md': return { paddingVertical: SPACING.md, paddingHorizontal: SPACING.lg };
+      case 'lg': return { paddingVertical: SPACING.md + 4, paddingHorizontal: SPACING.xl };
+      default: return { paddingVertical: SPACING.md, paddingHorizontal: SPACING.lg };
     }
   };
 
   const getFontSize = () => {
     switch (size) {
-      case 'sm': return 12;
+      case 'sm': return 13;
       case 'md': return 16;
       case 'lg': return 18;
       default: return 16;
@@ -91,6 +98,7 @@ export default function Button({
         {
           backgroundColor: getBackgroundColor(),
           ...getBorder(),
+          ...getShadow(),
           ...getPadding(),
         },
         style,
@@ -123,12 +131,12 @@ export default function Button({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.full, // Modern pill shape
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   text: {
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.semiBold, // Bolder text for buttons
   },
 });
