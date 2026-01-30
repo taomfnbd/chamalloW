@@ -58,8 +58,10 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
 export const api = {
   // Chat
   sendMessage: async (platform: string, message: string, conversationId: string, sessionId?: string) => {
+    console.log('API sendMessage called with:', { platform, message, conversationId, sessionId });
     if (!USE_MOCK) {
       const payload = { platform, message, conversationId, sessionId };
+      console.log('Sending payload to webhook:', payload);
       if (platform === 'linkedin') {
         return request(LINKEDIN_WEBHOOK, 'POST', payload, true);
       }
