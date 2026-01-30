@@ -1,35 +1,34 @@
 export const COLORS = {
   // Brand Colors
-  primary: '#FF5722', // Deep Orange - High Energy
-  primaryDark: '#E64A19',
-  primaryLight: '#FF8A65',
-  accent: '#2979FF', // Electric Blue for contrast
+  primary: '#F05A28', // Modern Orange
+  primaryGradient: ['#FF8C42', '#F05A28'], // For LinearGradient
+  accent: '#3B82F6', // Modern Blue
 
-  // Backgrounds
-  background: '#0F1115', // Very dark blue/grey
-  backgroundSecondary: '#181B21', // Card background
-  backgroundTertiary: '#23262E', // Input/Hover background
+  // Backgrounds - Deep Space Theme
+  background: '#0B0D12', // Deepest dark
+  backgroundSecondary: '#161922', // Card / Sidebar
+  backgroundTertiary: '#212530', // Inputs / Hovers
   
   // Text
   textPrimary: '#FFFFFF',
-  textSecondary: '#A0A3BD',
-  textMuted: '#6E7191',
-  textInverse: '#0F1115',
+  textSecondary: '#949BA6',
+  textMuted: '#5E6573',
+  textInverse: '#FFFFFF',
   
   // Status
-  success: '#00C853',
-  error: '#FF3D00',
-  warning: '#FFD600',
-  info: '#2979FF',
+  success: '#10B981', // Emerald
+  error: '#EF4444', // Red 500
+  warning: '#F59E0B', // Amber
+  info: '#3B82F6', // Blue 500
   
   // Chat
-  bubbleUser: '#FF5722',
-  bubbleAI: '#23262E',
+  bubbleUserGradient: ['#FF8C42', '#F05A28'],
+  bubbleAI: '#1E222B',
   
   // UI Elements
-  border: '#2E323B',
-  borderLight: '#3F4451',
-  overlay: 'rgba(15, 17, 21, 0.85)',
+  border: '#2A2E38',
+  borderLight: '#363B47',
+  overlay: 'rgba(11, 13, 18, 0.85)',
 };
 
 export const FONTS = {
@@ -40,51 +39,51 @@ export const FONTS = {
 };
 
 export const SPACING = {
-  xs: 4,
-  sm: 8,
+  xs: 6,
+  sm: 10,
   md: 16,
   lg: 24,
   xl: 32,
-  xxl: 48,
-  gutter: 20, // Standard screen padding
+  xxl: 50,
+  gutter: 20, 
 };
 
 export const BORDER_RADIUS = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  xxl: 32,
+  sm: 10,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 40,
   full: 9999,
 };
 
 export const SHADOWS = {
   small: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
   },
   medium: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5.84,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 8,
   },
   large: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.3,
+    shadowRadius: 25,
+    elevation: 16,
   },
   primary: {
-    shadowColor: '#FF5722',
+    shadowColor: '#F05A28',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 10, // Android (color shadow not supported natively well but elevation works)
+    shadowRadius: 15,
+    elevation: 10,
   }
 };

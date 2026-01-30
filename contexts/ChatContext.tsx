@@ -100,6 +100,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const sendMessage = async (platform: 'linkedin' | 'instagram' | 'images', content: string) => {
     let conversationId = currentConversationId;
 
+    // Ensure we don't append to a conversation of a different platform
+    const currentConv = conversations.find(c => c.id === conversationId);
+    if (currentConv && currentConv.platform !== platform) {
+      conversationId = null;
+    }
+
     if (!conversationId) {
       const newConv: Conversation = {
         id: uuidv4(),
@@ -164,12 +170,29 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
       } else {
         const response = await api.sendMessage(platform, content, conversationId!);
+        
+        // Helper to extract content from various n8n response formats
+        const getContent = (res: any) => {
+          if (typeof res === 'string') return res;
+          if (res?.response) return res.response;
+          if (res?.output) return res.output;
+          if (res?.content) return res.content;
+          if (res?.text) return res.text;
+          if (res?.message) return res.message;
+          // If response is an array (common in n8n), try first item
+          if (Array.isArray(res) && res.length > 0) return getContent(res[0]);
+          // Fallback
+          return typeof res === 'object' ? JSON.stringify(res) : '';
+        };
+
+        const aiContent = getContent(response);
+
         aiMsg = {
           id: uuidv4(),
           role: 'assistant',
-          content: response.response,
+          content: aiContent,
           timestamp: new Date(),
-          score: response.score,
+          score: response.score || 85,
           isEditable: true,
         };
       }

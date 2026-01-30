@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Text, KeyboardAvoidingView, Platform, LayoutAnimation, UIManager } from 'react-native';
+import { View, StyleSheet, FlatList, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 import Header from '../../components/ui/Header';
 import ConversationSidebar from '../../components/chat/ConversationSidebar';
@@ -41,14 +41,9 @@ export default function LinkedInScreen() {
   const [showAgent, setShowAgent] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
-  if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
-
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (currentConversation?.messages) {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       if (flatListRef.current) {
         setTimeout(() => {
           flatListRef.current?.scrollToEnd({ animated: true });
@@ -104,37 +99,36 @@ export default function LinkedInScreen() {
       />
 
       <View style={styles.chatContainer}>
-        {(!currentConversation || currentConversation.messages.length === 0) ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>👋 Salut Rudy !</Text>
-            
-            <SuggestionList 
-              suggestions={LINKEDIN_SUGGESTIONS} 
-              onSelect={handleSend} 
-            />
-          </View>
-        ) : (
-          <FlatList
-            ref={flatListRef}
-            data={currentConversation.messages}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.messagesList}
-            renderItem={({ item }) => (
-              item.isEditable ? (
-                <EditableMessage 
-                  message={item} 
-                  onUpdate={updateMessage}
-                  onRegenerate={regenerateMessage}
-                  onValidate={validateMessage}
-                  platform="linkedin"
-                />
-              ) : (
-                <ChatBubble message={item} />
-              )
-            )}
-            ListFooterComponent={isLoading ? <TypingIndicator /> : null}
-          />
-        )}
+        <FlatList
+          ref={flatListRef}
+          style={{ flex: 1 }}
+          data={currentConversation?.messages || []}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={(!currentConversation || currentConversation.messages.length === 0) ? styles.emptyContainer : styles.messagesList}
+          renderItem={({ item }) => (
+            item.isEditable ? (
+              <EditableMessage 
+                message={item} 
+                onUpdate={updateMessage}
+                onRegenerate={regenerateMessage}
+                onValidate={validateMessage}
+                platform="linkedin"
+              />
+            ) : (
+              <ChatBubble message={item} />
+            )
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyContent}>
+              <Text style={styles.emptyTitle}>👋 Salut Rudy !</Text>
+              <SuggestionList 
+                suggestions={LINKEDIN_SUGGESTIONS} 
+                onSelect={handleSend} 
+              />
+            </View>
+          }
+          ListFooterComponent={isLoading ? <TypingIndicator /> : null}
+        />
       </View>
 
       <ChatInput 
@@ -153,11 +147,16 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     paddingBottom: SPACING.md,
   },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
+  emptyContainer: {
+    flexGrow: 1,
+    justifyContent: 'center', // Revert to center if flexGrow fixes the size
     alignItems: 'center',
     padding: SPACING.xl,
+    paddingTop: 40,
+  },
+  emptyContent: {
+    width: '100%',
+    alignItems: 'center',
   },
   emptyTitle: {
     fontFamily: FONTS.bold,

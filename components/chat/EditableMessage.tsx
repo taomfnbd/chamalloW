@@ -5,7 +5,7 @@ import { Message } from '../../types';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import PostPreview from './PostPreview';
+// import PostPreview from './PostPreview'; // Disabled as per user request
 
 interface EditableMessageProps {
   message: Message;
@@ -69,11 +69,7 @@ export default function EditableMessage({
           </View>
         ) : (
           <View style={styles.contentContainer}>
-            {platform ? (
-              <PostPreview platform={platform} content={message.content} />
-            ) : (
-              <Text style={styles.text}>{message.content}</Text>
-            )}
+            <Text style={styles.text}>{message.content}</Text>
             
             <TouchableOpacity 
               onPress={() => setIsEditing(true)} 
@@ -85,13 +81,6 @@ export default function EditableMessage({
         )}
 
         <View style={styles.footer}>
-          {message.score !== undefined && (
-            <View style={styles.scoreContainer}>
-              <FontAwesome name="thumbs-up" size={14} color={COLORS.success} />
-              <Text style={styles.scoreText}>{message.score}/100</Text>
-            </View>
-          )}
-          
           <View style={styles.actions}>
             <TouchableOpacity onPress={() => onRegenerate(message.id)} style={styles.actionButton}>
               <FontAwesome name="refresh" size={18} color={COLORS.textSecondary} />

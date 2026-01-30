@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS, FONTS, SPACING, SHADOWS } from '../../constants/theme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as Haptics from 'expo-haptics';
@@ -26,7 +26,7 @@ export default function Header({
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.headerWrapper}>
       <View style={styles.container}>
         <TouchableOpacity 
           onPress={() => handlePress(onMenuPress)}
@@ -62,12 +62,12 @@ export default function Header({
           )}
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  headerWrapper: {
     backgroundColor: COLORS.backgroundSecondary,
     ...SHADOWS.small,
     zIndex: 100,
@@ -94,28 +94,6 @@ const styles = StyleSheet.create({
   },
   logoW: {
     color: COLORS.primary,
-  },
-  badge: {
-    marginLeft: SPACING.sm,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    transform: [{ translateY: 2 }],
-  },
-  badgeLinkedin: {
-    backgroundColor: 'rgba(0, 119, 181, 0.15)',
-    borderWidth: 1,
-    borderColor: '#0077B5',
-  },
-  badgeInstagram: {
-    backgroundColor: 'rgba(225, 48, 108, 0.15)',
-    borderWidth: 1,
-    borderColor: '#E1306C',
-  },
-  badgeText: {
-    fontSize: 10,
-    fontFamily: FONTS.bold,
-    color: COLORS.textPrimary,
   },
   actions: {
     flexDirection: 'row',

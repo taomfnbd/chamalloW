@@ -13,25 +13,45 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isFullUrl: boolean = false) {
   if (USE_MOCK) return null; // Skip for mock
 
-  try {
-    const url = isFullUrl ? endpoint : `${API_BASE}${endpoint}`;
-    const response = await fetch(url, {
+  const url = isFullUrl ? endpoint : `${API_BASE}${endpoint}`;
+  
+  const doFetch = async (fetchUrl: string) => {
+    const response = await fetch(fetchUrl, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': 'Bearer ...' // Add token here if needed
+        'Accept': 'application/json',
       },
       body: body ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      const text = await response.text();
+      console.error(`API Error: ${response.status}`, text);
+      throw new Error(`API Error: ${response.status} - ${text.substring(0, 100)}`);
     }
 
-    return await response.json();
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.warn('Response is not JSON:', text);
+      return { response: text, score: 85 };
+    }
+  };
+
+  try {
+    return await doFetch(url);
   } catch (error) {
-    console.error('API Request Failed:', error);
-    throw error;
+    console.warn('Direct request failed, trying proxy...', error);
+    try {
+      // Fallback to CORS proxy
+      const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+      return await doFetch(proxyUrl);
+    } catch (proxyError) {
+      console.error('API Request Failed (even with proxy):', proxyError);
+      throw proxyError;
+    }
   }
 }
 

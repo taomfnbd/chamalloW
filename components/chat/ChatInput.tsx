@@ -4,6 +4,7 @@ import { COLORS, SPACING, BORDER_RADIUS, FONTS, SHADOWS } from '../../constants/
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface Attachment {
   type: 'image' | 'document';
@@ -146,18 +147,28 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
           
           <TouchableOpacity 
             onPress={handleSend} 
-            style={[
-              styles.sendButton,
-              (text.trim().length > 0 || attachments.length > 0) ? styles.sendButtonActive : {}
-            ]}
             disabled={(text.trim().length === 0 && attachments.length === 0) || isLoading}
             activeOpacity={0.8}
+            style={styles.sendButtonWrapper}
           >
-            <FontAwesome 
-              name={isLoading ? "circle-o-notch" : "arrow-up"} 
-              size={18} 
-              color={(text.trim().length > 0 || attachments.length > 0) ? COLORS.textInverse : COLORS.textMuted} 
-            />
+            {(text.trim().length > 0 || attachments.length > 0) ? (
+              <LinearGradient
+                colors={COLORS.primaryGradient as [string, string]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.sendButton}
+              >
+                <FontAwesome 
+                  name={isLoading ? "circle-o-notch" : "arrow-up"} 
+                  size={16} 
+                  color="#FFF" 
+                />
+              </LinearGradient>
+            ) : (
+              <View style={[styles.sendButton, styles.sendButtonDisabled]}>
+                <FontAwesome name="arrow-up" size={16} color={COLORS.textMuted} />
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -282,18 +293,21 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     marginHorizontal: 4,
   },
+  sendButtonWrapper: {
+    marginBottom: 4,
+    marginRight: 4,
+  },
   sendButton: {
     width: 42,
     height: 42,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 21,
-    backgroundColor: COLORS.backgroundTertiary,
-    marginBottom: 4,
-    marginRight: 4,
-  },
-  sendButtonActive: {
-    backgroundColor: COLORS.primary,
     ...SHADOWS.primary,
+  },
+  sendButtonDisabled: {
+    backgroundColor: COLORS.backgroundTertiary,
+    elevation: 0,
+    shadowOpacity: 0,
   },
 });

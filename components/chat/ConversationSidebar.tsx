@@ -65,14 +65,32 @@ export default function ConversationSidebar({
       ]}
       onPress={() => onSelect(item.id)}
     >
-      <FontAwesome name="comment-o" size={14} color={COLORS.textSecondary} style={styles.itemIcon} />
+      {item.platform === 'linkedin' ? (
+        <FontAwesome name="linkedin-square" size={16} color="#0077B5" style={styles.itemIcon} />
+      ) : item.platform === 'instagram' ? (
+        <FontAwesome name="instagram" size={16} color="#E1306C" style={styles.itemIcon} />
+      ) : item.platform === 'images' ? (
+        <FontAwesome name="image" size={14} color={COLORS.primary} style={styles.itemIcon} />
+      ) : (
+        <FontAwesome name="comment-o" size={14} color={COLORS.textSecondary} style={styles.itemIcon} />
+      )}
+      
       <Text style={[
         styles.itemTitle,
         item.id === currentId && styles.itemTitleActive
       ]} numberOfLines={1}>
         {item.title || "Nouvelle conversation"}
       </Text>
-      {/* Delete button could be here, or on long press/swipe. Keeping it simple for now */}
+      
+      <TouchableOpacity 
+        style={styles.deleteBtn}
+        onPress={(e) => {
+          e.stopPropagation();
+          onDelete(item.id);
+        }}
+      >
+        <FontAwesome name="trash-o" size={14} color={COLORS.textMuted} />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 
@@ -114,9 +132,9 @@ export default function ConversationSidebar({
             <View style={styles.footer}>
               <TouchableOpacity style={styles.footerItem}>
                 <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>T</Text>
+                  <Text style={styles.avatarText}>R</Text>
                 </View>
-                <Text style={styles.footerText}>Tao Mariani</Text>
+                <Text style={styles.footerText}>Rudy Morel</Text>
               </TouchableOpacity>
             </View>
           </SafeAreaView>
@@ -212,6 +230,10 @@ const styles = StyleSheet.create({
   },
   itemTitleActive: {
     color: COLORS.textPrimary,
+  },
+  deleteBtn: {
+    padding: SPACING.xs,
+    marginLeft: SPACING.xs,
   },
   footer: {
     padding: SPACING.md,

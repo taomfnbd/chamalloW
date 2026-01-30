@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Text, Platform, LayoutAnimation, UIManager } from 'react-native';
+import { View, StyleSheet, FlatList, Text, Platform } from 'react-native';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 import Header from '../../components/ui/Header';
 import ConversationSidebar from '../../components/chat/ConversationSidebar';
@@ -42,13 +42,8 @@ export default function ImagesScreen() {
   const [showAgent, setShowAgent] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
-  if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
-
   useEffect(() => {
     if (currentConversation?.messages) {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       if (flatListRef.current) {
         setTimeout(() => {
           flatListRef.current?.scrollToEnd({ animated: true });
@@ -147,25 +142,24 @@ export default function ImagesScreen() {
       />
 
       <View style={styles.chatContainer}>
-        {(!currentConversation || currentConversation.messages.length === 0) ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>Générateur d'Images IA 🎨</Text>
-            
-            <SuggestionList 
-              suggestions={IMAGES_SUGGESTIONS} 
-              onSelect={handleSend} 
-            />
-          </View>
-        ) : (
-          <FlatList
-            ref={flatListRef}
-            data={currentConversation.messages}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.messagesList}
-            renderItem={renderItem}
-            ListFooterComponent={isLoading ? <TypingIndicator /> : null}
-          />
-        )}
+        <FlatList
+          ref={flatListRef}
+          style={{ flex: 1 }}
+          data={currentConversation?.messages || []}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={(!currentConversation || currentConversation.messages.length === 0) ? styles.emptyContainer : styles.messagesList}
+          renderItem={renderItem}
+          ListEmptyComponent={
+            <View style={styles.emptyContent}>
+              <Text style={styles.emptyTitle}>Générateur d'Images IA 🎨</Text>
+              <SuggestionList 
+                suggestions={IMAGES_SUGGESTIONS} 
+                onSelect={handleSend} 
+              />
+            </View>
+          }
+          ListFooterComponent={isLoading ? <TypingIndicator /> : null}
+        />
       </View>
 
       <ChatInput 
@@ -184,11 +178,16 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     paddingBottom: SPACING.md,
   },
-  emptyState: {
-    flex: 1,
+  emptyContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.xl,
+    paddingTop: 40,
+  },
+  emptyContent: {
+    width: '100%',
+    alignItems: 'center',
   },
   emptyTitle: {
     fontFamily: FONTS.bold,

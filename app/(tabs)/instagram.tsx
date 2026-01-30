@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Text } from 'react-native';
+import { View, StyleSheet, FlatList, Text, Platform } from 'react-native';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 import Header from '../../components/ui/Header';
 import ConversationSidebar from '../../components/chat/ConversationSidebar';
@@ -42,10 +42,12 @@ export default function InstagramScreen() {
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
-    if (currentConversation?.messages && flatListRef.current) {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+    if (currentConversation?.messages) {
+      if (flatListRef.current) {
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
     }
   }, [currentConversation?.messages]);
 
@@ -96,37 +98,36 @@ export default function InstagramScreen() {
       />
 
       <View style={styles.chatContainer}>
-        {(!currentConversation || currentConversation.messages.length === 0) ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>👋 Salut Rudy !</Text>
-            
-            <SuggestionList 
-              suggestions={INSTAGRAM_SUGGESTIONS} 
-              onSelect={handleSend} 
-            />
-          </View>
-        ) : (
-          <FlatList
-            ref={flatListRef}
-            data={currentConversation.messages}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.messagesList}
-            renderItem={({ item }) => (
-              item.isEditable ? (
-                <EditableMessage 
-                  message={item} 
-                  onUpdate={updateMessage}
-                  onRegenerate={regenerateMessage}
-                  onValidate={validateMessage}
-                  platform="instagram"
-                />
-              ) : (
-                <ChatBubble message={item} />
-              )
-            )}
-            ListFooterComponent={isLoading ? <TypingIndicator /> : null}
-          />
-        )}
+        <FlatList
+          ref={flatListRef}
+          style={{ flex: 1 }}
+          data={currentConversation?.messages || []}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={(!currentConversation || currentConversation.messages.length === 0) ? styles.emptyContainer : styles.messagesList}
+          renderItem={({ item }) => (
+            item.isEditable ? (
+              <EditableMessage 
+                message={item} 
+                onUpdate={updateMessage}
+                onRegenerate={regenerateMessage}
+                onValidate={validateMessage}
+                platform="instagram"
+              />
+            ) : (
+              <ChatBubble message={item} />
+            )
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyContent}>
+              <Text style={styles.emptyTitle}>👋 Salut Rudy !</Text>
+              <SuggestionList 
+                suggestions={INSTAGRAM_SUGGESTIONS} 
+                onSelect={handleSend} 
+              />
+            </View>
+          }
+          ListFooterComponent={isLoading ? <TypingIndicator /> : null}
+        />
       </View>
 
       <ChatInput 
@@ -145,11 +146,16 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     paddingBottom: SPACING.md,
   },
-  emptyState: {
-    flex: 1,
+  emptyContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.xl,
+    paddingTop: 40,
+  },
+  emptyContent: {
+    width: '100%',
+    alignItems: 'center',
   },
   emptyTitle: {
     fontFamily: FONTS.bold,
