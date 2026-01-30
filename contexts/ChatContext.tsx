@@ -22,16 +22,19 @@ interface ChatContextType {
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const STORAGE_KEY = '@chamalloW:conversations';
+const SESSION_STORAGE_KEY = '@chamalloW:sessions';
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [sessionIds, setSessionIds] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load from storage
   useEffect(() => {
     loadConversations();
+    loadSessions();
   }, []);
 
   // Save to storage
@@ -40,6 +43,37 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       saveConversations(conversations);
     }
   }, [conversations]);
+
+  const loadSessions = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(SESSION_STORAGE_KEY);
+      if (stored) {
+        setSessionIds(JSON.parse(stored));
+      } else {
+        // Initialize new sessions for known platforms
+        const newSessions = {
+          linkedin: uuidv4(),
+          instagram: uuidv4(),
+          images: uuidv4()
+        };
+        setSessionIds(newSessions);
+        await AsyncStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newSessions));
+      }
+    } catch (e) {
+      console.error('Failed to load sessions', e);
+    }
+  };
+
+  const getSessionId = async (platform: string) => {
+    if (sessionIds[platform]) return sessionIds[platform];
+    
+    // Create new if missing (shouldn't happen often)
+    const newId = uuidv4();
+    const newSessions = { ...sessionIds, [platform]: newId };
+    setSessionIds(newSessions);
+    await AsyncStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newSessions));
+    return newId;
+  };
 
   const loadConversations = async () => {
     try {
@@ -148,7 +182,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       let aiMsg: Message;
 
       if (platform === 'images') {
-        const response = await api.chatImage(content);
+        const sessionId = await getSessionId('images');
+        const response = await api.chatImage(content, undefined, sessionId);
         aiMsg = {
           id: uuidv4(),
           role: 'assistant',
@@ -169,7 +204,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
 
       } else {
-        const response = await api.sendMessage(platform, content, conversationId!);
+        const sessionId = await getSessionId(platform);
+        const response = await api.sendMessage(platform, content, conversationId!, sessionId);
         
         // Helper to extract content from various n8n response formats
         const getContent = (res: any) => {
@@ -250,7 +286,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
        const userMsg = msgIndex && msgIndex > 0 ? conv?.messages[msgIndex - 1] : null;
 
        if (userMsg) {
-         const response = await api.sendMessage(conv!.platform, userMsg.content + " (Regenerate)", currentConversationId);
+         const sessionId = await getSessionId(conv!.platform);
+         const response = await api.sendMessage(conv!.platform, userMsg.content + " (Regenerate)", currentConversationId, sessionId);
          
          setConversations(prev => prev.map(c => {
           if (c.id === currentConversationId) {

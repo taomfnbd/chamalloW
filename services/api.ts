@@ -57,15 +57,16 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
 
 export const api = {
   // Chat
-  sendMessage: async (platform: string, message: string, conversationId: string) => {
+  sendMessage: async (platform: string, message: string, conversationId: string, sessionId?: string) => {
     if (!USE_MOCK) {
+      const payload = { platform, message, conversationId, sessionId };
       if (platform === 'linkedin') {
-        return request(LINKEDIN_WEBHOOK, 'POST', { platform, message, conversationId }, true);
+        return request(LINKEDIN_WEBHOOK, 'POST', payload, true);
       }
       if (platform === 'instagram') {
-        return request(INSTAGRAM_WEBHOOK, 'POST', { platform, message, conversationId }, true);
+        return request(INSTAGRAM_WEBHOOK, 'POST', payload, true);
       }
-      return request('/chat', 'POST', { platform, message, conversationId });
+      return request('/chat', 'POST', payload);
     }
 
     // Mock Response
@@ -110,10 +111,10 @@ export const api = {
     };
   },
 
-  chatImage: async (message: string, imageUri?: string) => {
+  chatImage: async (message: string, imageUri?: string, sessionId?: string) => {
     if (!USE_MOCK) {
       // For real image upload, we might need FormData instead of JSON
-      return request('/chat/image', 'POST', { message, imageUri });
+      return request('/chat/image', 'POST', { message, imageUri, sessionId });
     }
 
     await delay(2000);
