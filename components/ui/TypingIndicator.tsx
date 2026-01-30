@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   bubble: {
-    backgroundColor: COLORS.bubbleAI,
+    backgroundColor: COLORS.backgroundSecondary,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     borderRadius: 20,
@@ -71,6 +71,8 @@ const styles = StyleSheet.create({
     gap: 4,
     alignItems: 'center',
     height: 40,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   dot: {
     width: 6,

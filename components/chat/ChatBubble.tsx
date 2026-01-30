@@ -61,10 +61,11 @@ export default function ChatBubble({ message }: ChatBubbleProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: SPACING.md,
+    marginVertical: SPACING.sm, // Tighter vertical spacing
     flexDirection: 'row',
     alignItems: 'flex-end',
     maxWidth: '100%',
+    paddingHorizontal: SPACING.xs, // Slight breathing room
   },
   containerUser: {
     justifyContent: 'flex-end',
@@ -73,25 +74,25 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 12,
+    width: 36, // Slightly larger
+    height: 36,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
     ...SHADOWS.small,
   },
   avatarAI: {
     backgroundColor: COLORS.backgroundSecondary,
     marginRight: SPACING.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
   },
   avatarUser: {
-    backgroundColor: COLORS.backgroundTertiary, // Subtle for user avatar since bubble is colorful
+    backgroundColor: COLORS.backgroundTertiary,
     marginLeft: SPACING.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
   },
   avatarText: {
     color: COLORS.textSecondary,
@@ -99,10 +100,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   bubble: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    maxWidth: '75%',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 18,
+    maxWidth: '78%', // Slightly wider
     ...SHADOWS.small,
   },
   bubbleUser: {
@@ -116,25 +117,29 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: FONTS.regular,
-    fontSize: 15, // Slightly smaller for modern feel
-    lineHeight: 22,
+    fontSize: 15,
+    lineHeight: 23, // Better readability
+    letterSpacing: 0.2,
   },
   textUser: {
-    color: '#FFF',
+    color: COLORS.textInverse,
+    fontWeight: '500', // Slightly bolder for contrast
   },
   textAI: {
     color: COLORS.textPrimary,
   },
   timestampUser: {
-    fontSize: 10,
+    fontSize: 11,
     color: 'rgba(255,255,255,0.7)',
-    marginTop: 4,
+    marginTop: 6,
     alignSelf: 'flex-end',
+    fontFamily: FONTS.medium,
   },
   timestampAI: {
-    fontSize: 10,
+    fontSize: 11,
     color: COLORS.textMuted,
-    marginTop: 4,
+    marginTop: 6,
     alignSelf: 'flex-start',
+    fontFamily: FONTS.medium,
   },
 });

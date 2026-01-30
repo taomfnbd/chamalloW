@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, FONTS, SPACING, SHADOWS } from '../../constants/theme';
+import { COLORS, FONTS, SPACING, SHADOWS, BORDER_RADIUS } from '../../constants/theme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as Haptics from 'expo-haptics';
 
@@ -68,19 +68,25 @@ export default function Header({
 
 const styles = StyleSheet.create({
   headerWrapper: {
-    backgroundColor: COLORS.backgroundSecondary,
-    ...SHADOWS.small,
+    backgroundColor: 'rgba(26, 29, 38, 0.85)', // Slightly translucent
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
     zIndex: 100,
+    // Web-specific blur would go here if using a platform-specific file or library
   },
   container: {
-    height: 60,
+    height: 64, // Taller header
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
+    maxWidth: 1200, // Constrain width on large screens
+    width: '100%',
+    alignSelf: 'center',
   },
   iconButton: {
     padding: SPACING.sm,
+    borderRadius: BORDER_RADIUS.sm,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -88,7 +94,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 24,
     color: COLORS.textPrimary,
     letterSpacing: -0.5,
   },
@@ -98,9 +104,15 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: SPACING.xs,
   },
   actionButton: {
     padding: SPACING.sm,
-    marginLeft: SPACING.xs,
+    backgroundColor: COLORS.backgroundTertiary,
+    borderRadius: BORDER_RADIUS.full,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

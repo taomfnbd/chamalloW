@@ -51,13 +51,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chip: {
-    backgroundColor: COLORS.backgroundTertiary,
+    backgroundColor: COLORS.backgroundSecondary,
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: BORDER_RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    ...SHADOWS.medium,
+    borderColor: COLORS.borderLight,
+    ...SHADOWS.small,
     minWidth: '45%', // Make them chunkier on mobile
     alignItems: 'center',
   },

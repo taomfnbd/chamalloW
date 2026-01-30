@@ -151,38 +151,43 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    // backdropFilter: 'blur(4px)', // Web only support via style prop hack if needed
   },
   sidebar: {
     width: '85%',
     maxWidth: 320,
-    backgroundColor: COLORS.background, // Use theme background
+    backgroundColor: COLORS.backgroundSecondary,
     height: '100%',
     shadowColor: "#000",
-    shadowOffset: { width: 2, height: 0 },
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowRadius: 30,
+    elevation: 20,
     borderRightWidth: 1,
-    borderRightColor: COLORS.border,
+    borderRightColor: COLORS.borderLight,
   },
   safeArea: {
     flex: 1,
   },
   header: {
     padding: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    paddingTop: SPACING.lg, // More space at top
   },
   newChatButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.backgroundSecondary, // Use theme background
-    padding: SPACING.md,
+    backgroundColor: COLORS.backgroundTertiary,
+    paddingVertical: 12,
+    paddingHorizontal: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderLight,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   newChatContent: {
     flexDirection: 'row',
