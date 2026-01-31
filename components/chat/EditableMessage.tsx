@@ -45,10 +45,10 @@ export default function EditableMessage({
   return (
     <View style={styles.wrapper}>
       <View style={styles.avatar}>
-        <FontAwesome name="bolt" size={14} color={COLORS.primary} />
+        <FontAwesome name="bolt" size={14} color={COLORS.textSecondary} />
       </View>
       
-      <View style={styles.container}>
+      <View style={styles.contentColumn}>
         {isEditing ? (
           <View style={styles.editContainer}>
             <TextInput
@@ -68,33 +68,24 @@ export default function EditableMessage({
             </View>
           </View>
         ) : (
-          <View style={styles.contentContainer}>
-            <Text style={styles.text}>{message.content}</Text>
+          <Text style={styles.text}>{message.content}</Text>
+        )}
+
+        {!isEditing && (
+          <View style={styles.actionsRow}>
+            <TouchableOpacity onPress={handleCopy} style={styles.actionButton} activeOpacity={0.7}>
+              <FontAwesome name="clipboard" size={14} color={COLORS.textSecondary} />
+            </TouchableOpacity>
             
-            <TouchableOpacity 
-              onPress={() => setIsEditing(true)} 
-              style={styles.editIcon}
-            >
-              <FontAwesome name="pencil" size={16} color={COLORS.textMuted} />
+            <TouchableOpacity onPress={() => onRegenerate(message.id)} style={styles.actionButton} activeOpacity={0.7}>
+              <FontAwesome name="refresh" size={14} color={COLORS.textSecondary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.actionButton} activeOpacity={0.7}>
+              <FontAwesome name="pencil" size={14} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
         )}
-
-        <View style={styles.footer}>
-          <View style={styles.actions}>
-            <TouchableOpacity onPress={() => onRegenerate(message.id)} style={styles.actionButton}>
-              <FontAwesome name="refresh" size={18} color={COLORS.textSecondary} />
-            </TouchableOpacity>
-            
-            <TouchableOpacity onPress={handleCopy} style={styles.actionButton}>
-              <FontAwesome name="clipboard" size={18} color={COLORS.textSecondary} />
-            </TouchableOpacity>
-            
-            <TouchableOpacity onPress={() => onValidate(message.id)} style={styles.actionButton}>
-              <FontAwesome name="check-circle" size={18} color={COLORS.success} />
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
     </View>
   );
@@ -102,64 +93,59 @@ export default function EditableMessage({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginVertical: SPACING.md, // Increased spacing
+    marginVertical: SPACING.md,
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start', // Top alignment for ChatGPT style
     width: '100%',
+    paddingHorizontal: SPACING.md,
   },
   avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 14,
+    width: 30,
+    height: 30,
+    borderRadius: 15, // Circle
     backgroundColor: COLORS.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: SPACING.sm,
+    marginRight: SPACING.md,
+    marginTop: 2,
     borderWidth: 1,
     borderColor: COLORS.border,
-    marginBottom: 4,
-    ...SHADOWS.small,
   },
-  container: {
+  contentColumn: {
     flex: 1,
-    backgroundColor: COLORS.bubbleAI,
-    borderRadius: 24, // Consistent with ChatBubble
-    borderBottomLeftRadius: 4,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    overflow: 'hidden',
-    ...SHADOWS.medium,
-  },
-  contentContainer: {
-    padding: 14,
-    paddingHorizontal: 18,
   },
   text: {
     fontFamily: FONTS.regular,
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 26, // Better readability
     color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
   },
-  editIcon: {
-    position: 'absolute',
-    top: SPACING.sm,
-    right: SPACING.sm,
-    padding: SPACING.xs,
-    zIndex: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 12,
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+    marginTop: 4,
   },
+  actionButton: {
+    padding: 6,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  // Editing Styles
   editContainer: {
+    backgroundColor: COLORS.backgroundSecondary,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     padding: SPACING.sm,
+    marginBottom: SPACING.sm,
   },
   input: {
-    backgroundColor: COLORS.backgroundTertiary,
     color: COLORS.textPrimary,
     fontFamily: FONTS.regular,
     fontSize: 16,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.sm,
-    minHeight: 150,
+    minHeight: 100,
+    padding: SPACING.xs,
   },
   editActions: {
     flexDirection: 'row',
@@ -168,8 +154,8 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   editButton: {
-    paddingVertical: SPACING.xs,
-    paddingHorizontal: SPACING.md,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: BORDER_RADIUS.sm,
   },
   saveButton: {
@@ -177,37 +163,12 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     color: COLORS.textSecondary,
+    fontSize: 13,
     fontFamily: FONTS.medium,
   },
   saveText: {
-    color: COLORS.textPrimary,
+    color: '#FFF',
+    fontSize: 13,
     fontFamily: FONTS.medium,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-    paddingHorizontal: 18,
-    backgroundColor: COLORS.backgroundTertiary,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  scoreContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  scoreText: {
-    color: COLORS.success,
-    fontFamily: FONTS.medium,
-    fontSize: 12,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: SPACING.lg,
-  },
-  actionButton: {
-    padding: 2,
   },
 });

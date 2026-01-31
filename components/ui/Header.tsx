@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, FONTS, SPACING, SHADOWS, BORDER_RADIUS } from '../../constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, GLASS } from '../../constants/theme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as Haptics from 'expo-haptics';
 
 interface HeaderProps {
-  platform?: string; // Deprecated but kept for compatibility
+  platform?: string;
   onMenuPress: () => void;
   onPlanningPress?: () => void;
   onAgentPress?: () => void;
@@ -32,7 +32,7 @@ export default function Header({
           onPress={() => handlePress(onMenuPress)}
           style={styles.iconButton}
         >
-          <FontAwesome name="bars" size={24} color={COLORS.textPrimary} />
+          <FontAwesome name="bars" size={20} color={COLORS.textSecondary} />
         </TouchableOpacity>
 
         <View style={styles.titleContainer}>
@@ -47,7 +47,7 @@ export default function Header({
                   onPress={() => handlePress(onPlanningPress)}
                   style={styles.actionButton}
                 >
-                  <FontAwesome name="calendar" size={20} color={COLORS.textPrimary} />
+                  <FontAwesome name="calendar" size={18} color={COLORS.textPrimary} />
                 </TouchableOpacity>
               )}
               {onAgentPress && (
@@ -55,7 +55,7 @@ export default function Header({
                   onPress={() => handlePress(onAgentPress)}
                   style={styles.actionButton}
                 >
-                  <FontAwesome name="bolt" size={20} color={COLORS.primary} />
+                  <FontAwesome name="bolt" size={18} color={COLORS.primary} />
                 </TouchableOpacity>
               )}
             </>
@@ -68,25 +68,28 @@ export default function Header({
 
 const styles = StyleSheet.create({
   headerWrapper: {
-    backgroundColor: 'rgba(26, 29, 38, 0.85)', // Slightly translucent
+    ...GLASS.heavy,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: 'rgba(255,255,255,0.03)',
     zIndex: 100,
-    // Web-specific blur would go here if using a platform-specific file or library
   },
   container: {
-    height: 64, // Taller header
+    height: 56, // Slightly more compact
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
-    maxWidth: 1200, // Constrain width on large screens
+    maxWidth: 1200,
     width: '100%',
     alignSelf: 'center',
   },
   iconButton: {
-    padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm,
+    width: 40,
+    height: 40,
+    borderRadius: BORDER_RADIUS.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
   titleContainer: {
     flexDirection: 'row',
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontFamily: FONTS.bold,
-    fontSize: 24,
+    fontSize: 20,
     color: COLORS.textPrimary,
     letterSpacing: -0.5,
   },
@@ -104,15 +107,17 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.xs,
+    gap: SPACING.sm,
   },
   actionButton: {
     padding: SPACING.sm,
-    backgroundColor: COLORS.backgroundTertiary,
+    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: BORDER_RADIUS.full,
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
   },
 });

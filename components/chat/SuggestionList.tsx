@@ -51,19 +51,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chip: {
-    backgroundColor: COLORS.backgroundSecondary,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: BORDER_RADIUS.xl,
+    backgroundColor: 'rgba(255,255,255,0.03)', // Subtle glass-like fill
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: COLORS.borderLight,
-    ...SHADOWS.small,
-    minWidth: '45%', // Make them chunkier on mobile
-    alignItems: 'center',
+    borderColor: COLORS.border,
+    marginBottom: 4,
   },
   text: {
-    color: COLORS.textPrimary,
-    fontFamily: FONTS.medium,
+    color: COLORS.textSecondary,
+    fontFamily: FONTS.regular,
     fontSize: 14,
   },
 });

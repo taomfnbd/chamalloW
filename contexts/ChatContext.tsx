@@ -10,7 +10,7 @@ interface ChatContextType {
   currentConversation: Conversation | null;
   isLoading: boolean;
   error: string | null;
-  sendMessage: (platform: 'linkedin' | 'instagram' | 'images', content: string) => Promise<void>;
+  sendMessage: (platform: 'linkedin' | 'instagram' | 'images', content: string, attachments?: any[]) => Promise<void>;
   updateMessage: (messageId: string, newContent: string) => void;
   regenerateMessage: (messageId: string) => Promise<void>;
   validateMessage: (messageId: string) => void;
@@ -131,7 +131,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const sendMessage = async (platform: 'linkedin' | 'instagram' | 'images', content: string) => {
+  const sendMessage = async (platform: 'linkedin' | 'instagram' | 'images', content: string, attachments?: any[]) => {
     let conversationId = currentConversationId;
 
     // Ensure we don't append to a conversation of a different platform
@@ -162,6 +162,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       role: 'user',
       content,
       timestamp: new Date(),
+      attachments,
     };
 
     setConversations(prev => prev.map(c => {
@@ -205,7 +206,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
       } else {
         const sessionId = await getSessionId(platform);
-        const response = await api.sendMessage(platform, content, conversationId!, sessionId);
+        const response = await api.sendMessage(platform, content, conversationId!, sessionId, attachments);
         
         // Helper to extract content from various n8n response formats
         const getContent = (res: any) => {

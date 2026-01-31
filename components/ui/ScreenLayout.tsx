@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, StatusBar, Platform } from 'react-native';
+import { StyleSheet, StatusBar, Platform, View } from 'react-native';
 import { COLORS } from '../../constants/theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface ScreenLayoutProps {
   children: React.ReactNode;
@@ -9,29 +10,38 @@ interface ScreenLayoutProps {
 }
 
 export default function ScreenLayout({ children, style }: ScreenLayoutProps) {
-  // On web, we might not want top safe area if we want to go edge-to-edge
-  // or if the browser chrome is already handling spacing.
-  // However, usually SafeAreaView handles web correctly if configured.
-  // We'll keep it but ensure style overrides are possible and valid.
   return (
-    <SafeAreaView 
-      edges={Platform.OS === 'web' ? ['left', 'right'] : ['top', 'left', 'right']} 
-      style={[
-        styles.container, 
-        Platform.OS === 'web' ? { paddingTop: 'env(safe-area-inset-top)' } : {},
-        style
-      ]}
-    >
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
-      {children}
-    </SafeAreaView>
+    <View style={styles.backgroundWrapper}>
+      {/* Subtle background glow */}
+      <LinearGradient
+        colors={[COLORS.background, COLORS.backgroundModal]}
+        style={StyleSheet.absoluteFillObject}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      />
+      
+      <SafeAreaView 
+        edges={Platform.OS === 'web' ? ['left', 'right'] : ['top', 'left', 'right']} 
+        style={[
+          styles.container, 
+          Platform.OS === 'web' ? { paddingTop: 'env(safe-area-inset-top)' } : {},
+          style
+        ]}
+      >
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+        {children}
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  backgroundWrapper: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  container: {
+    flex: 1,
     width: '100%',
   },
 });

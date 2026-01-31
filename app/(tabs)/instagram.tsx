@@ -51,8 +51,8 @@ export default function InstagramScreen() {
     }
   }, [currentConversation?.messages]);
 
-  const handleSend = (content: string) => {
-    sendMessage('instagram', content);
+  const handleSend = (content: string, attachments?: any[]) => {
+    sendMessage('instagram', content, attachments);
   };
 
   const handleNewConversation = () => {
@@ -131,7 +131,7 @@ export default function InstagramScreen() {
       </View>
 
       <ChatInput 
-        onSend={(content, attachments) => handleSend(content)} 
+        onSend={handleSend} 
         isLoading={isLoading}
       />
     </ScreenLayout>

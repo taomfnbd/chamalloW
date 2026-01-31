@@ -23,9 +23,10 @@ export interface Message {
 // Attachment
 export interface Attachment {
   id: string;
-  type: 'image' | 'pdf' | 'document';
+  type: 'image' | 'pdf' | 'document' | 'audio';
   uri: string;
   name: string;
+  duration?: number; // Duration in seconds for audio
 }
 
 // Planning

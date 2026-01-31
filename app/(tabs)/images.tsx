@@ -61,7 +61,7 @@ export default function ImagesScreen() {
         return;
       }
     }
-    sendMessage('images', content);
+    sendMessage('images', content, attachments);
   };
 
   const handleNewConversation = () => {

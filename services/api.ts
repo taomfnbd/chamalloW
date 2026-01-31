@@ -1,4 +1,5 @@
 import { PlanningConfig, AgentConfig } from '../types';
+import * as FileSystem from 'expo-file-system';
 
 // Configuration
 const API_BASE = 'https://your-n8n-webhook.com';
@@ -57,10 +58,34 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
 
 export const api = {
   // Chat
-  sendMessage: async (platform: string, message: string, conversationId: string, sessionId?: string) => {
-    console.log('API sendMessage called with:', { platform, message, conversationId, sessionId });
+  sendMessage: async (platform: string, message: string, conversationId: string, sessionId?: string, attachments?: any[]) => {
+    console.log('API sendMessage called with:', { platform, message, conversationId, sessionId, attachments });
     if (!USE_MOCK) {
-      const payload = { platform, message, conversationId, sessionId };
+      let processedAttachments = [];
+      
+      if (attachments && attachments.length > 0) {
+        processedAttachments = await Promise.all(attachments.map(async (att) => {
+          // If base64 is already present (Web), return as is
+          if (att.base64) return att;
+
+          // If no base64 and has URI (Mobile), try to read it
+          if (att.uri) {
+            try {
+              const base64 = await FileSystem.readAsStringAsync(att.uri, { encoding: 'base64' });
+              return {
+                ...att,
+                base64
+              };
+            } catch (e) {
+              console.error('Failed to read file', att.uri, e);
+              return att;
+            }
+          }
+          return att;
+        }));
+      }
+
+      const payload = { platform, message, conversationId, sessionId, attachments: processedAttachments };
       console.log('Sending payload to webhook:', payload);
       if (platform === 'linkedin') {
         return request(LINKEDIN_WEBHOOK, 'POST', payload, true);

@@ -52,8 +52,8 @@ export default function LinkedInScreen() {
     }
   }, [currentConversation?.messages]);
 
-  const handleSend = (content: string) => {
-    sendMessage('linkedin', content);
+  const handleSend = (content: string, attachments?: any[]) => {
+    sendMessage('linkedin', content, attachments);
   };
 
   const handleNewConversation = () => {
@@ -132,7 +132,7 @@ export default function LinkedInScreen() {
       </View>
 
       <ChatInput 
-        onSend={(content, attachments) => handleSend(content)} 
+        onSend={handleSend} 
         isLoading={isLoading}
       />
     </ScreenLayout>
