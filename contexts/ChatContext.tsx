@@ -199,6 +199,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       if (platform === 'images') {
         const sessionId = await getSessionId('images');
         const response = await api.chatImage(content, undefined, sessionId);
+        console.log('ChatImage response:', JSON.stringify(response, null, 2));
         
         // Helper to extract image URL from various formats
         const getImageUrl = (res: any): string | null => {
@@ -215,6 +216,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         };
 
         const imageUrl = getImageUrl(response);
+        console.log('Extracted imageUrl:', imageUrl);
         const textContent = response?.text || response?.message || (imageUrl ? "Voici l'image générée." : getContent(response));
 
         aiMsg = {
