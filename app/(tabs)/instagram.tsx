@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Text, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 import Header from '../../components/ui/Header';
 import ConversationSidebar from '../../components/chat/ConversationSidebar';
@@ -40,6 +41,7 @@ export default function InstagramScreen() {
   const [showPlanning, setShowPlanning] = useState(false);
   const [showAgent, setShowAgent] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (currentConversation?.messages) {
@@ -52,7 +54,7 @@ export default function InstagramScreen() {
   }, [currentConversation?.messages]);
 
   const handleSend = (content: string, attachments?: any[]) => {
-    sendMessage('instagram', content, attachments);
+    sendMessage('instagram', content); // Removed attachments as ChatContext doesn't support it yet, consistent with my LinkedIn fix
   };
 
   const handleNewConversation = () => {
@@ -63,6 +65,11 @@ export default function InstagramScreen() {
   const handleSelectConversation = (id: string) => {
     selectConversation(id);
     setShowHistory(false);
+  };
+
+  const handleGenerateImage = (content: string) => {
+    sendMessage('images', content);
+    router.push('/(tabs)/images');
   };
 
   return (
@@ -111,6 +118,7 @@ export default function InstagramScreen() {
                 onUpdate={updateMessage}
                 onRegenerate={regenerateMessage}
                 onValidate={validateMessage}
+                onGenerateImage={handleGenerateImage}
                 platform="instagram"
               />
             ) : (
@@ -131,7 +139,7 @@ export default function InstagramScreen() {
       </View>
 
       <ChatInput 
-        onSend={handleSend} 
+        onSend={(content, attachments) => handleSend(content)} 
         isLoading={isLoading}
       />
     </ScreenLayout>

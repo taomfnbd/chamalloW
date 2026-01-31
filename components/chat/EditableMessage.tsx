@@ -12,6 +12,7 @@ interface EditableMessageProps {
   onUpdate: (id: string, newContent: string) => void;
   onRegenerate: (id: string) => void;
   onValidate: (id: string) => void;
+  onGenerateImage?: (content: string) => void;
   platform?: 'linkedin' | 'instagram';
 }
 
@@ -20,6 +21,7 @@ export default function EditableMessage({
   onUpdate, 
   onRegenerate, 
   onValidate,
+  onGenerateImage,
   platform
 }: EditableMessageProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -84,6 +86,12 @@ export default function EditableMessage({
             <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.actionButton} activeOpacity={0.7}>
               <FontAwesome name="pencil" size={14} color={COLORS.textSecondary} />
             </TouchableOpacity>
+
+            {onGenerateImage && (
+              <TouchableOpacity onPress={() => onGenerateImage(message.content)} style={styles.actionButton} activeOpacity={0.7}>
+                <FontAwesome name="image" size={14} color={COLORS.textSecondary} />
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>

@@ -5,6 +5,7 @@ import * as FileSystem from 'expo-file-system';
 const API_BASE = 'https://your-n8n-webhook.com';
 const LINKEDIN_WEBHOOK = 'https://n8nagence.performai.ovh/webhook/450e94d5-e701-4d2c-8f86-826a84b377eb';
 const INSTAGRAM_WEBHOOK = 'https://n8nagence.performai.ovh/webhook/8efd9f29-7e93-4c53-b216-25bba85464e2';
+const IMAGES_WEBHOOK = 'https://n8nagence.performai.ovh/webhook/9cd8090e-4dfd-447f-b02a-563fd2a9debd';
 const USE_MOCK = false; // Set to false to use real API
 
 // Mock delay helper
@@ -141,7 +142,7 @@ export const api = {
   chatImage: async (message: string, imageUri?: string, sessionId?: string) => {
     if (!USE_MOCK) {
       // For real image upload, we might need FormData instead of JSON
-      return request('/chat/image', 'POST', { message, imageUri, sessionId });
+      return request(IMAGES_WEBHOOK, 'POST', { message, imageUri, sessionId }, true);
     }
 
     await delay(2000);
