@@ -182,46 +182,61 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     try {
       let aiMsg: Message;
 
+      // Helper to extract content from various n8n response formats
+      const getContent = (res: any): string => {
+        if (typeof res === 'string') return res;
+        if (res?.response) return res.response;
+        if (res?.output) return res.output;
+        if (res?.content) return res.content;
+        if (res?.text) return res.text;
+        if (res?.message) return res.message;
+        // If response is an array (common in n8n), try first item
+        if (Array.isArray(res) && res.length > 0) return getContent(res[0]);
+        // Fallback
+        return typeof res === 'object' ? JSON.stringify(res) : '';
+      };
+
       if (platform === 'images') {
         const sessionId = await getSessionId('images');
         const response = await api.chatImage(content, undefined, sessionId);
+        
+        // Helper to extract image URL from various formats
+        const getImageUrl = (res: any): string | null => {
+          if (res?.content && res?.type === 'image') return res.content;
+          if (res?.output && (String(res.output).startsWith('http') || String(res.output).startsWith('data:'))) return res.output;
+          if (res?.image) return res.image;
+          if (res?.url) return res.url;
+          if (res?.imageUrl) return res.imageUrl;
+          // Check if response itself is a URL string
+          if (typeof res === 'string' && (res.startsWith('http') || res.startsWith('data:'))) return res;
+          // Check first item of array
+          if (Array.isArray(res) && res.length > 0) return getImageUrl(res[0]);
+          return null;
+        };
+
+        const imageUrl = getImageUrl(response);
+        const textContent = response?.text || response?.message || (imageUrl ? "Voici l'image générée." : getContent(response));
+
         aiMsg = {
           id: uuidv4(),
           role: 'assistant',
-          content: response.content || response.text || '', 
+          content: textContent,
           timestamp: new Date(),
         };
 
-        if (response.type === 'image' && response.content) {
-           aiMsg.content = response.text || "Voici l'image générée.";
+        if (imageUrl) {
            aiMsg.attachments = [{
              id: uuidv4(),
              type: 'image',
-             uri: response.content,
+             uri: imageUrl,
              name: 'generated.jpg'
            }];
-        } else {
-           aiMsg.content = response.text || '';
         }
 
       } else {
         const sessionId = await getSessionId(platform);
         const response = await api.sendMessage(platform, content, conversationId!, sessionId, attachments);
         
-        // Helper to extract content from various n8n response formats
-        const getContent = (res: any) => {
-          if (typeof res === 'string') return res;
-          if (res?.response) return res.response;
-          if (res?.output) return res.output;
-          if (res?.content) return res.content;
-          if (res?.text) return res.text;
-          if (res?.message) return res.message;
-          // If response is an array (common in n8n), try first item
-          if (Array.isArray(res) && res.length > 0) return getContent(res[0]);
-          // Fallback
-          return typeof res === 'object' ? JSON.stringify(res) : '';
-        };
-
         const aiContent = getContent(response);
 
         aiMsg = {
