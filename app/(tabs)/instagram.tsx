@@ -34,7 +34,8 @@ export default function InstagramScreen() {
     selectConversation, 
     newConversation,
     deleteConversation,
-    isLoading 
+    isLoading,
+    error 
   } = useChat('instagram');
 
   const [showHistory, setShowHistory] = useState(false);
@@ -54,7 +55,7 @@ export default function InstagramScreen() {
   }, [currentConversation?.messages]);
 
   const handleSend = (content: string, attachments?: any[]) => {
-    sendMessage('instagram', content); // Removed attachments as ChatContext doesn't support it yet, consistent with my LinkedIn fix
+    sendMessage('instagram', content); 
   };
 
   const handleNewConversation = () => {
@@ -73,7 +74,7 @@ export default function InstagramScreen() {
   };
 
   return (
-    <ScreenLayout>
+    <ScreenLayout error={error}>
       <Header 
         platform="Instagram"
         onMenuPress={() => setShowHistory(!showHistory)}

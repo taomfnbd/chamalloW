@@ -34,7 +34,8 @@ export default function ImagesScreen() {
     selectConversation, 
     newConversation,
     deleteConversation,
-    isLoading 
+    isLoading,
+    error
   } = useChat('images');
 
   const [showHistory, setShowHistory] = useState(false);
@@ -61,7 +62,7 @@ export default function ImagesScreen() {
         return;
       }
     }
-    sendMessage('images', content, attachments);
+    sendMessage('images', content);
   };
 
   const handleNewConversation = () => {
@@ -109,7 +110,7 @@ export default function ImagesScreen() {
   };
 
   return (
-    <ScreenLayout>
+    <ScreenLayout error={error}>
       <Header 
         platform="Images" // Deprecated logic but useful title? No badge.
         // Actually Header ignores platform badge now.

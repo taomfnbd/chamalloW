@@ -14,6 +14,8 @@ interface ChatBubbleProps {
 
 export default function ChatBubble({ message }: ChatBubbleProps) {
   const isUser = message.role === 'user';
+  const isEmptyResponse = message.content === '{}' || message.content === '[{}]' || message.content === '[]';
+  const displayContent = isEmptyResponse ? "⚠️ Réponse vide du serveur. Vérifiez n8n." : message.content;
 
   return (
     <View style={[
@@ -41,7 +43,7 @@ export default function ChatBubble({ message }: ChatBubbleProps) {
             />
           ) : (
             <Text style={[styles.text, styles.textUser]}>
-              {message.content}
+              {displayContent}
             </Text>
           )}
           <Text style={styles.timestampUser}>
@@ -50,8 +52,8 @@ export default function ChatBubble({ message }: ChatBubbleProps) {
         </LinearGradient>
       ) : (
         <View style={styles.contentAI}>
-          <Text style={[styles.text, styles.textAI]}>
-            {message.content}
+          <Text style={[styles.text, styles.textAI, isEmptyResponse && styles.textError]}>
+            {displayContent}
           </Text>
           {/* AI messages might not need visible timestamp in ChatGPT style, or it can be subtle below */}
         </View>
@@ -140,6 +142,10 @@ const styles = StyleSheet.create({
   },
   textAI: {
     color: COLORS.textPrimary,
+  },
+  textError: {
+    color: COLORS.error,
+    fontStyle: 'italic',
   },
   timestampUser: {
     fontSize: 10,

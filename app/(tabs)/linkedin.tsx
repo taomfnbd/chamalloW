@@ -34,7 +34,8 @@ export default function LinkedInScreen() {
     selectConversation, 
     newConversation,
     deleteConversation,
-    isLoading 
+    isLoading,
+    error
   } = useChat('linkedin');
 
   const [showHistory, setShowHistory] = useState(false);
@@ -55,11 +56,7 @@ export default function LinkedInScreen() {
   }, [currentConversation?.messages]);
 
   const handleSend = (content: string, attachments?: any[]) => {
-    sendMessage('linkedin', content); // attachments is used in ChatInput onSend but sendMessage here expects (platform, content) usually, though user's api allows attachments? Wait, ChatContext sendMessage signature is (platform, content). I should stick to that unless updated. The original file had handleSend(content) inside render. The read_file output shows handleSend = (content) => sendMessage... wait, no, the READ FILE output showed: handleSend = (content) => { sendMessage('linkedin', content); };.
-    // Wait, let's double check the read_file output of linkedin.tsx I got earlier.
-    // "const handleSend = (content: string) => { sendMessage('linkedin', content); };"
-    // But ChatInput onSend passes (content, attachments).
-    // I will stick to what was there.
+    sendMessage('linkedin', content);
   };
 
   const handleNewConversation = () => {
@@ -78,7 +75,7 @@ export default function LinkedInScreen() {
   };
 
   return (
-    <ScreenLayout>
+    <ScreenLayout error={error}>
       <Header 
         platform="LinkedIn"
         onMenuPress={() => setShowHistory(!showHistory)}
