@@ -64,8 +64,14 @@ export default function InstagramScreen() {
   };
 
   const handleSelectConversation = (id: string) => {
+    const selectedConv = conversations.find(c => c.id === id);
     selectConversation(id);
     setShowHistory(false);
+
+    if (selectedConv && selectedConv.platform !== 'instagram') {
+      if (selectedConv.platform === 'linkedin') router.push('/(tabs)/linkedin');
+      if (selectedConv.platform === 'images') router.push('/(tabs)/images');
+    }
   };
 
   const handleGenerateImage = (content: string) => {

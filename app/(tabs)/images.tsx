@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Text, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 import Header from '../../components/ui/Header';
 import ConversationSidebar from '../../components/chat/ConversationSidebar';
@@ -42,6 +43,7 @@ export default function ImagesScreen() {
   const [showPlanning, setShowPlanning] = useState(false);
   const [showAgent, setShowAgent] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (currentConversation?.messages) {
@@ -71,8 +73,14 @@ export default function ImagesScreen() {
   };
 
   const handleSelectConversation = (id: string) => {
+    const selectedConv = conversations.find(c => c.id === id);
     selectConversation(id);
     setShowHistory(false);
+
+    if (selectedConv && selectedConv.platform !== 'images') {
+      if (selectedConv.platform === 'linkedin') router.push('/(tabs)/linkedin');
+      if (selectedConv.platform === 'instagram') router.push('/(tabs)/instagram');
+    }
   };
 
   const renderItem = ({ item }: { item: any }) => {

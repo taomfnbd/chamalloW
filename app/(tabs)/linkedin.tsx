@@ -65,8 +65,14 @@ export default function LinkedInScreen() {
   };
 
   const handleSelectConversation = (id: string) => {
+    const selectedConv = conversations.find(c => c.id === id);
     selectConversation(id);
     setShowHistory(false);
+
+    if (selectedConv && selectedConv.platform !== 'linkedin') {
+      if (selectedConv.platform === 'instagram') router.push('/(tabs)/instagram');
+      if (selectedConv.platform === 'images') router.push('/(tabs)/images');
+    }
   };
 
   const handleGenerateImage = (content: string) => {
