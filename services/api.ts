@@ -34,6 +34,7 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
     }
 
     const text = await response.text();
+    console.log('Raw API Response:', text.substring(0, 500)); // Log first 500 chars
     try {
       return JSON.parse(text);
     } catch (e) {
