@@ -31,6 +31,7 @@ export const COLORS = {
   
   // Chat Specifics
   bubbleUserGradient: ['#FF6B35', '#F05A28'], 
+  bubbleUser: '#F05A28', // Fallback solid color
   bubbleAI: 'rgba(39, 39, 42, 0.6)', // Zinc-800 with opacity
   
   // UI Elements
