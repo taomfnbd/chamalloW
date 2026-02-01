@@ -23,9 +23,10 @@ export default function AudioPlayer({ uri, duration, isUser = false }: AudioPlay
   // Web State
   const webAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Generate random waveform bars once
+  // Generate static waveform bars once
   const bars = useMemo(() => {
-    return Array.from({ length: 20 }, () => Math.max(0.3, Math.random()));
+    // Generate 35 bars with random heights between 0.4 and 1.0
+    return Array.from({ length: 35 }, () => Math.max(0.4, Math.random()));
   }, []);
 
   // Cleanup
@@ -123,7 +124,7 @@ export default function AudioPlayer({ uri, duration, isUser = false }: AudioPlay
 
   return (
     <View style={[styles.container, isUser && styles.containerUser]}>
-      <TouchableOpacity onPress={handlePlayPause} activeOpacity={0.8}>
+      <TouchableOpacity onPress={handlePlayPause} activeOpacity={0.8} style={styles.playBtnWrapper}>
         {isUser ? (
           <View style={styles.playButtonUser}>
             <FontAwesome 
@@ -146,28 +147,29 @@ export default function AudioPlayer({ uri, duration, isUser = false }: AudioPlay
         )}
       </TouchableOpacity>
       
-      <View style={styles.waveformContainer}>
-        {bars.map((height, index) => {
-          const barProgress = index / bars.length;
-          const isActive = barProgress < progress;
-          return (
-            <View 
-              key={index} 
-              style={[
-                styles.bar, 
-                { 
-                  height: 12 + (height * 16),
-                  backgroundColor: isActive ? activeColor : inactiveColor
-                }
-              ]} 
-            />
-          );
-        })}
+      <View style={styles.contentContainer}>
+        <View style={styles.waveformContainer}>
+          {bars.map((height, index) => {
+            const barProgress = index / bars.length;
+            const isActive = barProgress < progress;
+            return (
+              <View 
+                key={index} 
+                style={[
+                  styles.bar, 
+                  { 
+                    height: 10 + (height * 14),
+                    backgroundColor: isActive ? activeColor : inactiveColor
+                  }
+                ]} 
+              />
+            );
+          })}
+        </View>
+        <Text style={[styles.duration, { color: textColor }]}>
+          {isPlaying ? formatDuration(currentPosition) : (duration ? formatDuration(duration) : '0:00')}
+        </Text>
       </View>
-      
-      <Text style={[styles.duration, { color: textColor }]}>
-        {isPlaying ? formatDuration(currentPosition) : (duration ? formatDuration(duration) : '0:00')}
-      </Text>
     </View>
   );
 }
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
     padding: SPACING.sm,
     paddingRight: SPACING.md,
     marginTop: SPACING.xs,
-    width: 240,
+    width: 250,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
   },
@@ -190,15 +192,17 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     padding: 0,
     marginTop: 0,
-    width: 220, // Slightly tighter in bubble
+    width: 240, 
+  },
+  playBtnWrapper: {
+    marginRight: SPACING.sm,
   },
   playButtonUser: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: SPACING.md,
     backgroundColor: '#FFFFFF',
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -207,36 +211,35 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   playButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: SPACING.md,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 3,
   },
-  waveformContainer: {
+  contentContainer: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  waveformContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 30,
-    gap: 2,
-    marginRight: SPACING.md,
+    height: 24,
+    gap: 2, // Space between bars
+    marginBottom: 4,
   },
   bar: {
     width: 3,
-    borderRadius: 2,
+    borderRadius: 1.5,
   },
   duration: {
-    color: COLORS.textSecondary,
     fontSize: 11,
-    fontFamily: FONTS.medium,
-    fontVariant: ['tabular-nums'], // Fixed width numbers to avoid jitter
-    minWidth: 35,
-    textAlign: 'right',
+    fontFamily: FONTS.regular,
+    marginLeft: 2,
   },
 });

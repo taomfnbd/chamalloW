@@ -29,16 +29,6 @@ export interface Attachment {
   duration?: number; // Duration in seconds for audio
 }
 
-// Planning
-export interface PlanningConfig {
-  platform: 'linkedin' | 'instagram' | 'images';
-  days: number[]; // 0-6 (dimanche-samedi)
-  time: string; // "HH:mm"
-  contentType: 'motivation' | 'conseil' | 'temoignage' | 'promo' | 'random';
-  notifyOnReady: boolean;
-  requireValidation: boolean;
-}
-
 // Agent Config
 export interface AgentConfig {
   instructions: string[];

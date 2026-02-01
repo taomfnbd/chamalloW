@@ -1,4 +1,4 @@
-import { PlanningConfig, AgentConfig } from '../types';
+import { AgentConfig } from '../types';
 import * as FileSystem from 'expo-file-system';
 
 // Configuration
@@ -18,13 +18,21 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
   const url = isFullUrl ? endpoint : `${API_BASE}${endpoint}`;
   
   const doFetch = async (fetchUrl: string) => {
+    const headers: any = {
+      'Accept': 'application/json',
+    };
+
+    let processedBody = body;
+
+    if (!(body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+      processedBody = body ? JSON.stringify(body) : undefined;
+    }
+
     const response = await fetch(fetchUrl, {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
+      headers,
+      body: processedBody,
     });
 
     if (!response.ok) {
@@ -63,32 +71,46 @@ export const api = {
   sendMessage: async (platform: string, message: string, conversationId: string, sessionId?: string, attachments?: any[]) => {
     console.log('API sendMessage called with:', { platform, message, conversationId, sessionId, attachments });
     if (!USE_MOCK) {
-      let processedAttachments = [];
-      
       if (attachments && attachments.length > 0) {
-        processedAttachments = await Promise.all(attachments.map(async (att) => {
-          // If base64 is already present (Web), return as is
-          if (att.base64) return att;
+        const formData = new FormData();
+        formData.append('platform', platform);
+        formData.append('message', message);
+        formData.append('conversationId', conversationId);
+        if (sessionId) formData.append('sessionId', sessionId);
 
-          // If no base64 and has URI (Mobile), try to read it
-          if (att.uri) {
-            try {
-              const base64 = await FileSystem.readAsStringAsync(att.uri, { encoding: 'base64' });
-              return {
-                ...att,
-                base64
-              };
-            } catch (e) {
-              console.error('Failed to read file', att.uri, e);
-              return att;
-            }
+        attachments.forEach((att: any) => {
+          // On Web, att might have base64 if not Blob? 
+          // ChatInput passes base64 on Web. 
+          // If we want to support FormData on Web properly, ChatInput should pass the Blob.
+          // But constructing FormData with base64 string isn't standard file upload.
+          // For now, let's trust that mobile uses URI and Web logic needs review if this fails.
+          // React Native FormData handles { uri, name, type } object.
+          
+          if (att.uri && !att.base64) {
+             formData.append('files', {
+               uri: att.uri,
+               name: att.name,
+               type: att.mimeType || 'application/octet-stream',
+             } as any);
+          } else if (att.base64) {
+             // Fallback for Web if ChatInput sends base64
+             // We can append it as string or try to convert (complex).
+             // Let's send as a string field for now or skip.
+             formData.append('file_base64', att.base64);
+             formData.append('file_name', att.name);
+             formData.append('file_type', att.mimeType);
           }
-          return att;
-        }));
+        });
+
+        console.log('Sending FormData payload');
+        if (platform === 'linkedin') return request(LINKEDIN_WEBHOOK, 'POST', formData, true);
+        if (platform === 'instagram') return request(INSTAGRAM_WEBHOOK, 'POST', formData, true);
+        return request('/chat', 'POST', formData);
       }
 
-      const payload = { platform, message, conversationId, sessionId, attachments: processedAttachments };
-      console.log('Sending payload to webhook:', payload);
+      // JSON Fallback for text only
+      const payload = { platform, message, conversationId, sessionId };
+      console.log('Sending JSON payload:', payload);
       if (platform === 'linkedin') {
         return request(LINKEDIN_WEBHOOK, 'POST', payload, true);
       }
@@ -104,17 +126,6 @@ export const api = {
       response: `Voici une proposition pour ton post ${platform} sur : "${message}"\n\n💪 Les kettlebells sont l'outil ultime pour une transformation physique complète. Pas besoin de passer des heures à la salle...\n\n#Kettlebell #Transformation #Fitness #Marseille`,
       score: Math.floor(Math.random() * 20) + 80 
     };
-  },
-
-  // Planning
-  updatePlanning: async (config: PlanningConfig) => {
-    if (!USE_MOCK) {
-      return request('/planning', 'POST', config);
-    }
-
-    await delay(1000);
-    console.log('Planning updated:', config);
-    return { success: true };
   },
 
   // Agent

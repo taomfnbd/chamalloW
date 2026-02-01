@@ -7,7 +7,6 @@ import * as Haptics from 'expo-haptics';
 interface HeaderProps {
   platform?: string;
   onMenuPress: () => void;
-  onPlanningPress?: () => void;
   onAgentPress?: () => void;
   showActions?: boolean;
 }
@@ -15,7 +14,6 @@ interface HeaderProps {
 export default function Header({ 
   platform, 
   onMenuPress, 
-  onPlanningPress, 
   onAgentPress,
   showActions = true 
 }: HeaderProps) {
@@ -42,14 +40,6 @@ export default function Header({
         <View style={styles.actions}>
           {showActions && (
             <>
-              {onPlanningPress && (
-                <TouchableOpacity 
-                  onPress={() => handlePress(onPlanningPress)}
-                  style={styles.actionButton}
-                >
-                  <FontAwesome name="calendar" size={18} color={COLORS.textPrimary} />
-                </TouchableOpacity>
-              )}
               {onAgentPress && (
                 <TouchableOpacity 
                   onPress={() => handlePress(onAgentPress)}

@@ -132,6 +132,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   };
 
   const sendMessage = async (platform: 'linkedin' | 'instagram' | 'images', content: string, attachments?: any[]) => {
+    console.log('ChatContext sendMessage:', { platform, content, attachmentsCount: attachments?.length });
     let conversationId = currentConversationId;
 
     // Ensure we don't append to a conversation of a different platform

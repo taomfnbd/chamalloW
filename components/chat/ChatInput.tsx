@@ -6,8 +6,10 @@ import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { Audio } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Attachment {
+  id: string;
   type: 'image' | 'document' | 'audio';
   uri: string;
   name: string;
@@ -84,6 +86,7 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
       
       if (uri) {
         onSend('🎤 Message vocal', [{
+          id: uuidv4(),
           type: 'audio',
           uri,
           name: 'voice_message.m4a',
@@ -119,6 +122,7 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
             reader.onloadend = () => {
               const base64data = (reader.result as string).split(',')[1];
               onSend('🎤 Message vocal', [{
+                id: uuidv4(),
                 type: 'audio',
                 uri: audioUrl,
                 name: 'voice_message.webm',
@@ -212,6 +216,7 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
     if (!result.canceled) {
       const asset = result.assets[0];
       setAttachments(prev => [...prev, {
+        id: uuidv4(),
         type: 'image',
         uri: asset.uri,
         name: asset.fileName || 'image.jpg',
@@ -230,6 +235,7 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
     if (!result.canceled) {
       const asset = result.assets[0];
       setAttachments(prev => [...prev, {
+        id: uuidv4(),
         type: 'document',
         uri: asset.uri,
         name: asset.name,

@@ -12,7 +12,6 @@ import SuggestionList from '../../components/chat/SuggestionList';
 import ScreenLayout from '../../components/ui/ScreenLayout';
 import TypingIndicator from '../../components/ui/TypingIndicator';
 import { useChat } from '../../hooks/useChat';
-import PlanningModal from '../../components/planning/PlanningModal';
 import AgentTrainer from '../../components/agent/AgentTrainer';
 import { api } from '../../services/api';
 import * as ImagePicker from 'expo-image-picker';
@@ -40,7 +39,6 @@ export default function ImagesScreen() {
   } = useChat('images');
 
   const [showHistory, setShowHistory] = useState(false);
-  const [showPlanning, setShowPlanning] = useState(false);
   const [showAgent, setShowAgent] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
@@ -64,7 +62,7 @@ export default function ImagesScreen() {
         return;
       }
     }
-    sendMessage('images', content);
+    sendMessage('images', content, attachments);
   };
 
   const handleNewConversation = () => {
@@ -123,15 +121,7 @@ export default function ImagesScreen() {
         platform="Images" // Deprecated logic but useful title? No badge.
         // Actually Header ignores platform badge now.
         onMenuPress={() => setShowHistory(!showHistory)}
-        onPlanningPress={() => setShowPlanning(true)}
         onAgentPress={() => setShowAgent(true)}
-      />
-
-      <PlanningModal
-        visible={showPlanning}
-        onClose={() => setShowPlanning(false)}
-        onSave={(config) => api.updatePlanning(config)}
-        platform="images"
       />
 
       <AgentTrainer

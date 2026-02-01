@@ -8,7 +8,6 @@ import ChatBubble from '../../components/chat/ChatBubble';
 import EditableMessage from '../../components/chat/EditableMessage';
 import ChatInput from '../../components/chat/ChatInput';
 import { useChat } from '../../hooks/useChat';
-import PlanningModal from '../../components/planning/PlanningModal';
 import AgentTrainer from '../../components/agent/AgentTrainer';
 import SuggestionList from '../../components/chat/SuggestionList';
 import ScreenLayout from '../../components/ui/ScreenLayout';
@@ -39,7 +38,6 @@ export default function InstagramScreen() {
   } = useChat('instagram');
 
   const [showHistory, setShowHistory] = useState(false);
-  const [showPlanning, setShowPlanning] = useState(false);
   const [showAgent, setShowAgent] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
@@ -55,7 +53,7 @@ export default function InstagramScreen() {
   }, [currentConversation?.messages]);
 
   const handleSend = (content: string, attachments?: any[]) => {
-    sendMessage('instagram', content); 
+    sendMessage('instagram', content, attachments); 
   };
 
   const handleNewConversation = () => {
@@ -84,15 +82,7 @@ export default function InstagramScreen() {
       <Header 
         platform="Instagram"
         onMenuPress={() => setShowHistory(!showHistory)}
-        onPlanningPress={() => setShowPlanning(true)}
         onAgentPress={() => setShowAgent(true)}
-      />
-
-      <PlanningModal
-        visible={showPlanning}
-        onClose={() => setShowPlanning(false)}
-        onSave={(config) => api.updatePlanning(config)}
-        platform="instagram"
       />
 
       <AgentTrainer
@@ -146,7 +136,7 @@ export default function InstagramScreen() {
       </View>
 
       <ChatInput 
-        onSend={(content, attachments) => handleSend(content)} 
+        onSend={handleSend} 
         isLoading={isLoading}
       />
     </ScreenLayout>

@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
-import AudioPlayer from './AudioPlayer';
+import VoiceMessagePlayer from './VoiceMessagePlayer';
 
 interface ChatBubbleProps {
   message: Message;
@@ -35,16 +35,23 @@ export default function ChatBubble({ message }: ChatBubbleProps) {
           end={{ x: 1, y: 1 }}
           style={[styles.bubble, styles.bubbleUser]}
         >
-          {message.attachments?.find(a => a.type === 'audio') ? (
-            <AudioPlayer 
-              uri={message.attachments.find(a => a.type === 'audio')!.uri} 
-              duration={message.attachments.find(a => a.type === 'audio')!.duration}
+          {(message.attachments?.length && (message.attachments.find(a => a.type === 'audio') || message.content === '🎤 Message vocal')) ? (
+            <VoiceMessagePlayer 
+              uri={message.attachments.find(a => a.type === 'audio')?.uri || message.attachments[0].uri} 
+              duration={message.attachments.find(a => a.type === 'audio')?.duration || message.attachments[0].duration}
               isUser={isUser}
             />
           ) : (
-            <Text style={[styles.text, styles.textUser]}>
-              {displayContent}
-            </Text>
+            <View>
+              <Text style={[styles.text, styles.textUser]}>
+                {displayContent}
+              </Text>
+              {message.content === '🎤 Message vocal' && !message.attachments?.length && (
+                <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 4, fontStyle: 'italic' }}>
+                  (Audio manquant - Réessayez)
+                </Text>
+              )}
+            </View>
           )}
           <Text style={styles.timestampUser}>
             {format(message.timestamp, 'HH:mm', { locale: fr })}
