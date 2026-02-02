@@ -8,20 +8,14 @@
   "scope": "/chamalloW/",
   "icons": [
     {
-      "src": "/chamalloW/assets/images/chamallow-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/chamalloW/assets/images/chamallow-icon.svg",
+      "src": "/chamalloW/assets/images/icon.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "/chamalloW/assets/images/chamallow-icon.svg",
+      "src": "/chamalloW/assets/images/icon.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
