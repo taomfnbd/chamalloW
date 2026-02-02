@@ -7,7 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+import { View, Platform, StyleSheet } from 'react-native';
 import { COLORS } from '../constants/theme';
 import { ChatProvider, useChatContext } from '../contexts/ChatContext';
 import Toast from '../components/ui/Toast';
@@ -67,9 +67,19 @@ function RootLayoutNav() {
 function AppContent() {
   const { error } = useChatContext();
   
+  // Structure responsive unifiée : 
+  // Sur mobile : plein écran.
+  // Sur desktop : plein écran aussi ("normal"), mais on peut limiter la largeur du contenu 
+  // pour la lisibilité si nécessaire via les composants eux-mêmes, ou ici globalement.
+  // Pour l'instant, on laisse plein écran comme demandé ("normal").
+  
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <Stack>
+      <Stack screenOptions={{
+        headerShown: false,
+        // Optionnel : Limiter la largeur max du contenu sur les très grands écrans
+        // contentStyle: { maxWidth: 1200, width: '100%', alignSelf: 'center' } 
+      }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <Toast message={error} />

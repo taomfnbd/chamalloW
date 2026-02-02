@@ -14,21 +14,37 @@ interface AgentTrainerProps {
 }
 
 export default function AgentTrainer({ visible, onClose, onSave }: AgentTrainerProps) {
-  const [instructions, setInstructions] = useState<string[]>(['Utilise toujours un emoji 💪 au début de mes posts.', 'Ton amical et motivant.']);
+  // Gestion par onglets
+  const [activeTab, setActiveTab] = useState<'general' | 'photo' | 'instagram' | 'linkedin'>('general');
+
+  // Instructions séparées par contexte
+  const [instructionsMap, setInstructionsMap] = useState({
+    general: [],
+    photo: [],
+    instagram: [],
+    linkedin: []
+  });
+
   const [newInstruction, setNewInstruction] = useState('');
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [keywords, setKeywords] = useState<string[]>(['kettlebell', 'transformation', 'force']);
+  const [keywords, setKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState('');
 
   const handleAddInstruction = () => {
     if (newInstruction.trim()) {
-      setInstructions([...instructions, newInstruction.trim()]);
+      setInstructionsMap({
+        ...instructionsMap,
+        [activeTab]: [...instructionsMap[activeTab], newInstruction.trim()]
+      });
       setNewInstruction('');
     }
   };
 
   const handleRemoveInstruction = (index: number) => {
-    setInstructions(instructions.filter((_, i) => i !== index));
+    setInstructionsMap({
+      ...instructionsMap,
+      [activeTab]: instructionsMap[activeTab].filter((_, i) => i !== index)
+    });
   };
 
   const handleAddDocument = async () => {
@@ -70,13 +86,75 @@ export default function AgentTrainer({ visible, onClose, onSave }: AgentTrainerP
     setKeywords(keywords.filter(k => k !== keyword));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // 1. Sauvegarde locale (on aplatit tout pour la compatibilité existante si besoin, ou on adapte onSave plus tard)
+    // Pour l'instant on garde une structure simple pour le composant parent, ou on lui passe tout
+    // Le composant parent attend AgentConfig qui a instructions: string[]. 
+    // On va concaténer tout pour le parent pour ne pas casser l'app, mais le webhook aura le détail.
+    const allInstructionsFlat = [
+      ...instructionsMap.general,
+      ...instructionsMap.photo,
+      ...instructionsMap.instagram,
+      ...instructionsMap.linkedin
+    ];
+
     onSave({
-      instructions,
+      instructions: allInstructionsFlat, // Rétrocompatibilité interne
       documents,
       keywords,
       updatedAt: new Date(),
     });
+
+    // 2. Envoi au Webhook - PAYLOAD STRUCTURÉ (Aplati pour clarté n8n)
+    const payload = {
+      // Instructions par canal
+      general_instructions: instructionsMap.general,
+      photo_instructions: instructionsMap.photo,
+      instagram_instructions: instructionsMap.instagram,
+      linkedin_instructions: instructionsMap.linkedin,
+      
+      // Autres données
+      documents: documents.map(d => d.name),
+      keywords,
+      timestamp: new Date().toISOString()
+    };
+    
+    const WEBHOOK_URL = process.env.EXPO_PUBLIC_AGENT_WEBHOOK || ''; 
+
+    try {
+      // if (__DEV__) console.log('Envoi au webhook:', payload);
+      
+      // 1. GET (Résumé)
+      const summary = {
+        // Version finale
+        instructions_count: allInstructionsFlat.length,
+        ...payload // On essaie de tout mettre si ça tient
+      };
+      const getUrl = `${WEBHOOK_URL}?data=${encodeURIComponent(JSON.stringify(summary))}`;
+      fetch(getUrl, { mode: 'no-cors' }).catch(e => console.error('GET fail', e));
+
+      // 2. POST (Payload complet structuré)
+      const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+      const beaconSent = navigator.sendBeacon(WEBHOOK_URL, blob);
+
+      if (beaconSent) {
+        alert('✅ Données envoyées !');
+      } else {
+        // 3. Fallback Fetch si Beacon échoue
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
+        });
+        alert('✅ Données envoyées (Fetch)');
+      }
+      
+    } catch (error: any) {
+      console.error('Erreur webhook:', error);
+      alert(`⚠️ Erreur d'envoi: ${error.message}`);
+    }
+
     onClose();
   };
 
@@ -91,23 +169,60 @@ export default function AgentTrainer({ visible, onClose, onSave }: AgentTrainerP
             </TouchableOpacity>
           </View>
           
+          {/* NAVIGATION ONGLETS */}
+          <View style={styles.tabsContainer}>
+            <TouchableOpacity 
+              style={[styles.tab, activeTab === 'general' && styles.activeTab]} 
+              onPress={() => setActiveTab('general')}
+            >
+              <FontAwesome name="globe" size={16} color={activeTab === 'general' ? COLORS.textInverse : COLORS.textSecondary} />
+              <Text style={[styles.tabText, activeTab === 'general' && styles.activeTabText]}>Général</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.tab, activeTab === 'photo' && styles.activeTab]} 
+              onPress={() => setActiveTab('photo')}
+            >
+              <FontAwesome name="camera" size={16} color={activeTab === 'photo' ? COLORS.textInverse : COLORS.textSecondary} />
+              <Text style={[styles.tabText, activeTab === 'photo' && styles.activeTabText]}>Photo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.tab, activeTab === 'instagram' && styles.activeTab]} 
+              onPress={() => setActiveTab('instagram')}
+            >
+              <FontAwesome name="instagram" size={16} color={activeTab === 'instagram' ? COLORS.textInverse : COLORS.textSecondary} />
+              <Text style={[styles.tabText, activeTab === 'instagram' && styles.activeTabText]}>Insta</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.tab, activeTab === 'linkedin' && styles.activeTab]} 
+              onPress={() => setActiveTab('linkedin')}
+            >
+              <FontAwesome name="linkedin" size={16} color={activeTab === 'linkedin' ? COLORS.textInverse : COLORS.textSecondary} />
+              <Text style={[styles.tabText, activeTab === 'linkedin' && styles.activeTabText]}>LinkedIn</Text>
+            </TouchableOpacity>
+          </View>
+
           <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <Text style={styles.subtitle}>
-              Personnalise le style de Rudy et enrichis ses connaissances. 
-              Ces éléments s'ajoutent à la base existante.
+              {activeTab === 'general' && "Ces règles s'appliqueront à TOUS les agents."}
+              {activeTab === 'photo' && "Instructions spécifiques pour l'analyse et la génération photo."}
+              {activeTab === 'instagram' && "Spécificités pour les légendes et stories Instagram."}
+              {activeTab === 'linkedin' && "Ton et format pour le réseau professionnel."}
             </Text>
             
-            {/* INSTRUCTIONS */}
+            {/* INSTRUCTIONS LIST */}
             <View style={styles.section}>
-              <Text style={styles.label}>Instructions de Style & Règles</Text>
-              <Text style={styles.helperText}>Ex: "Ne jamais utiliser d'exclamation excessive", "Mentionner toujours le lien bio".</Text>
-              
               <View style={styles.listContainer}>
-                {instructions.map((inst, index) => (
+                {instructionsMap[activeTab].length === 0 && (
+                  <Text style={styles.emptyText}>Aucune instruction spécifique pour le moment.</Text>
+                )}
+                {instructionsMap[activeTab].map((inst, index) => (
                   <View key={index} style={styles.listItem}>
                     <Text style={styles.listItemText}>{inst}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveInstruction(index)}>
-                      <FontAwesome name="trash-o" size={16} color={COLORS.error} />
+                    <TouchableOpacity onPress={() => handleRemoveInstruction(index)} style={styles.trashIcon}>
+                      <FontAwesome name="trash-o" size={18} color={COLORS.error} />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -365,6 +480,47 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontFamily: FONTS.medium,
     fontSize: 13,
+  },
+  // Styles pour les cibles
+  tabsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+    gap: SPACING.xs,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: BORDER_RADIUS.md,
+    backgroundColor: COLORS.backgroundTertiary,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  activeTab: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  tabText: {
+    fontFamily: FONTS.medium,
+    color: COLORS.textSecondary,
+    fontSize: 13,
+  },
+  activeTabText: {
+    color: COLORS.textInverse,
+    fontFamily: FONTS.bold,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: COLORS.textMuted,
+    fontStyle: 'italic',
+    marginTop: SPACING.md,
+  },
+  trashIcon: {
+    padding: 8,
   },
   footer: {
     padding: SPACING.lg,

@@ -2,18 +2,18 @@ import { AgentConfig } from '../types';
 import * as FileSystem from 'expo-file-system';
 
 // Configuration
-const API_BASE = 'https://your-n8n-webhook.com';
-const LINKEDIN_WEBHOOK = 'https://n8nagence.performai.ovh/webhook/450e94d5-e701-4d2c-8f86-826a84b377eb';
-const INSTAGRAM_WEBHOOK = 'https://n8nagence.performai.ovh/webhook/8efd9f29-7e93-4c53-b216-25bba85464e2';
-const IMAGES_WEBHOOK = 'https://n8nagence.performai.ovh/webhook/9cd8090e-4dfd-447f-b02a-563fd2a9debd';
-const USE_MOCK = false; // Set to false to use real API
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'https://your-n8n-webhook.com';
+const LINKEDIN_WEBHOOK = process.env.EXPO_PUBLIC_LINKEDIN_WEBHOOK || '';
+const INSTAGRAM_WEBHOOK = process.env.EXPO_PUBLIC_INSTAGRAM_WEBHOOK || '';
+const IMAGES_WEBHOOK = process.env.EXPO_PUBLIC_IMAGES_WEBHOOK || '';
+const USE_MOCK = false; 
 
 // Mock delay helper
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Generic API handler
 async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isFullUrl: boolean = false) {
-  if (USE_MOCK) return null; // Skip for mock
+  if (USE_MOCK) return null; 
 
   const url = isFullUrl ? endpoint : `${API_BASE}${endpoint}`;
   
@@ -37,16 +37,16 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
 
     if (!response.ok) {
       const text = await response.text();
-      console.error(`API Error: ${response.status}`, text);
-      throw new Error(`API Error: ${response.status} - ${text.substring(0, 100)}`);
+      if (__DEV__) console.error(`API Error: ${response.status}`, text);
+      throw new Error(`API Error: ${response.status}`);
     }
 
     const text = await response.text();
-    console.log('Raw API Response:', text.substring(0, 500)); // Log first 500 chars
+    // if (__DEV__) console.log('Raw API Response:', text.substring(0, 500)); 
     try {
       return JSON.parse(text);
     } catch (e) {
-      console.warn('Response is not JSON:', text);
+      if (__DEV__) console.warn('Response is not JSON:', text);
       return { response: text, score: 85 };
     }
   };
@@ -54,13 +54,13 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
   try {
     return await doFetch(url);
   } catch (error) {
-    console.warn('Direct request failed, trying proxy...', error);
+    if (__DEV__) console.warn('Direct request failed, trying proxy...', error);
     try {
       // Fallback to CORS proxy
       const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
       return await doFetch(proxyUrl);
     } catch (proxyError) {
-      console.error('API Request Failed (even with proxy):', proxyError);
+      if (__DEV__) console.error('API Request Failed (even with proxy):', proxyError);
       throw proxyError;
     }
   }
@@ -69,7 +69,7 @@ async function request(endpoint: string, method: 'GET' | 'POST', body?: any, isF
 export const api = {
   // Chat
   sendMessage: async (platform: string, message: string, conversationId: string, sessionId?: string, attachments?: any[]) => {
-    console.log('API sendMessage called with:', { platform, message, conversationId, sessionId, attachments });
+    // if (__DEV__) console.log('API sendMessage called with:', { platform, message, conversationId, sessionId, attachments });
     if (!USE_MOCK) {
       if (attachments && attachments.length > 0) {
         const formData = new FormData();
@@ -79,13 +79,6 @@ export const api = {
         if (sessionId) formData.append('sessionId', sessionId);
 
         attachments.forEach((att: any) => {
-          // On Web, att might have base64 if not Blob? 
-          // ChatInput passes base64 on Web. 
-          // If we want to support FormData on Web properly, ChatInput should pass the Blob.
-          // But constructing FormData with base64 string isn't standard file upload.
-          // For now, let's trust that mobile uses URI and Web logic needs review if this fails.
-          // React Native FormData handles { uri, name, type } object.
-          
           if (att.uri && !att.base64) {
              formData.append('files', {
                uri: att.uri,
@@ -93,16 +86,12 @@ export const api = {
                type: att.mimeType || 'application/octet-stream',
              } as any);
           } else if (att.base64) {
-             // Fallback for Web if ChatInput sends base64
-             // We can append it as string or try to convert (complex).
-             // Let's send as a string field for now or skip.
              formData.append('file_base64', att.base64);
              formData.append('file_name', att.name);
              formData.append('file_type', att.mimeType);
           }
         });
 
-        console.log('Sending FormData payload');
         if (platform === 'linkedin') return request(LINKEDIN_WEBHOOK, 'POST', formData, true);
         if (platform === 'instagram') return request(INSTAGRAM_WEBHOOK, 'POST', formData, true);
         return request('/chat', 'POST', formData);
@@ -110,7 +99,6 @@ export const api = {
 
       // JSON Fallback for text only
       const payload = { platform, message, conversationId, sessionId };
-      console.log('Sending JSON payload:', payload);
       if (platform === 'linkedin') {
         return request(LINKEDIN_WEBHOOK, 'POST', payload, true);
       }
@@ -135,7 +123,7 @@ export const api = {
     }
 
     await delay(2000);
-    console.log('Agent updated:', config);
+    if (__DEV__) console.log('Agent updated:', config);
     return { success: true };
   },
 

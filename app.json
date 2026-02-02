@@ -14,9 +14,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chamallow.app"
     },
     "android": {
+      "package": "com.chamallow.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -29,9 +31,9 @@
       "output": "single",
       "favicon": "./assets/images/favicon.png",
       "display": "standalone",
-      "orientation": "portrait",
-      "themeColor": "#ffffff",
-      "backgroundColor": "#ffffff"
+      "orientation": "default",
+      "themeColor": "#09090B",
+      "backgroundColor": "#09090B"
     },
     "plugins": [
       "expo-router",
