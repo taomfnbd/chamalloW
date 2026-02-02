@@ -5,7 +5,7 @@ export const COLORS = {
   primary: '#F05A28', // Core Orange
   primaryLight: '#FF8A65',
   primaryDark: '#D64010',
-  primaryGradient: ['#FF6B35', '#F05A28'], // Warmer, smoother gradient
+  primaryGradient: ['#FF8A65', '#F05A28'], // More vibrant start
   
   accent: '#3B82F6', // Modern Blue
   secondaryAccent: '#8B5CF6', // Purple

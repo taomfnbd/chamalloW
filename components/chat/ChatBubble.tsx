@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, GLASS } from '../../constants/theme';
 import { Message } from '../../types';
 import { format } from 'date-fns';
@@ -23,8 +23,12 @@ export default function ChatBubble({ message }: ChatBubbleProps) {
       isUser ? styles.containerUser : styles.containerAI
     ]}>
       {!isUser && (
-        <View style={styles.avatarAI}>
-          <FontAwesome name="bolt" size={14} color={COLORS.textSecondary} />
+        <View style={styles.avatarContainer}>
+          <Image 
+            source={require('../../assets/images/icon.png')} 
+            style={styles.avatarImage} 
+            resizeMode="contain"
+          />
         </View>
       )}
       
@@ -99,22 +103,33 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   avatarAI: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    // Deprecated style kept for safety if needed, but replaced by avatarContainer
+    width: 32,
+    height: 32,
+  },
+  avatarContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
     backgroundColor: COLORS.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.md,
     marginTop: 2,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 20,
+    height: 20,
   },
   avatarUser: {
     backgroundColor: 'rgba(240, 90, 40, 0.1)',
     marginLeft: SPACING.sm,
     borderWidth: 1,
     borderColor: 'rgba(240, 90, 40, 0.2)',
+    borderRadius: 14, // Squircle-ish
   },
   avatarText: {
     color: COLORS.primary,
@@ -124,14 +139,15 @@ const styles = StyleSheet.create({
   bubble: {
     paddingVertical: 14,
     paddingHorizontal: 18,
-    borderRadius: 24,
+    borderRadius: 22,
     maxWidth: '85%',
     ...SHADOWS.small,
   },
   bubbleUser: {
-    borderBottomRightRadius: 6,
+    borderBottomRightRadius: 4,
     shadowColor: COLORS.primary,
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.2, // Slightly stronger shadow
+    shadowRadius: 8,
   },
   contentAI: {
     flex: 1,
@@ -140,7 +156,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONTS.regular,
     fontSize: 15,
-    lineHeight: 24,
+    lineHeight: 26, // Better readability
     letterSpacing: 0.3,
   },
   textUser: {
